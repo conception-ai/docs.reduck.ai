@@ -172,6 +172,10 @@ staged docs are rebuilt. When code `staging` is released to code `main`, docs `s
 released to docs `main` the same way. Git is the state: a page in `staging` belongs to the staged
 release, a page in `main` is live.
 
+The line has to be in place **before** the code pull request is merged. The merge is the moment
+it is read, and a line added after that is never looked at — the page then sits open until
+someone merges it by hand.
+
 A change that documents nothing in the code repository — a typo, a rewording, a missing page for
 something already shipped — needs no `Code-PR:` line. Target `staging` anyway and merge it; it
 goes out with the next release.
