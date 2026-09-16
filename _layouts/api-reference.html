@@ -1,0 +1,59 @@
+---
+layout: docs-shell
+---
+
+{%- comment -%}
+  Scalar draws the operation list and the endpoints from the OpenAPI document. The app serves that
+  document without CORS headers, so a browser here cannot read it: `.github/workflows/pages.yml`
+  fetches it at build time and the copy in `assets/` is what this page opens.
+{%- endcomment -%}
+<div class="reference" id="api-reference-root"></div>
+
+<style>
+	/* Scalar's theme variables, mapped onto the design tokens, so the reference stays in step with
+	   the prose beside it. */
+	#api-reference-root {
+		--scalar-color-accent: var(--color-orange-500);
+		--scalar-background-1: var(--color-grey-900);
+		--scalar-background-2: var(--color-grey-800);
+		--scalar-background-3: var(--color-grey-700);
+		--scalar-border-color: var(--color-grey-700);
+		--scalar-color-1: var(--color-grey-50);
+		--scalar-color-2: var(--color-grey-300);
+		--scalar-color-3: var(--color-grey-500);
+		--scalar-sidebar-background-1: var(--color-grey-900);
+		--scalar-sidebar-border-color: var(--color-grey-700);
+		--scalar-sidebar-color-1: var(--color-grey-50);
+		--scalar-sidebar-color-2: var(--color-grey-400);
+		--scalar-sidebar-color-active: var(--color-orange-500);
+		--scalar-sidebar-item-hover-background: var(--color-grey-800);
+		--scalar-sidebar-item-hover-color: var(--color-grey-50);
+		--scalar-sidebar-item-active-background: var(--color-grey-800);
+		--scalar-sidebar-search-background: var(--color-grey-800);
+		--scalar-sidebar-search-border-color: var(--color-grey-700);
+		--scalar-sidebar-search-color: var(--color-grey-300);
+
+		/* The panel stands beside the docs nav, so it is the width of one. */
+		--scalar-sidebar-width: 280px;
+
+		min-height: 100%;
+	}
+
+	#api-reference-root .scalar-mcp-layer {
+		display: none !important;
+	}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1/dist/browser/standalone.js"></script>
+<script>
+	Scalar.createApiReference("#api-reference-root", {
+		url: "{{ '/assets/openapi.json' | relative_url }}",
+		// No registry or AI-search calls, so the reference is as self-contained as the prose.
+		agent: { disabled: true },
+		forceDarkModeState: "dark",
+		hideDarkModeToggle: true,
+		// The operation list, as a second panel beside the docs nav: the endpoints are not pages,
+		// so nothing else in the shell can list them.
+		showSidebar: true
+	});
+</script>

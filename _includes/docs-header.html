@@ -1,0 +1,24 @@
+{%- comment -%}
+  The bar under the site nav. Its field is the way in, not the field that is typed into: it is
+  readonly, and taking the focus raises the palette that carries the real one.
+{%- endcomment -%}
+<header class="docs-header">
+	<button class="btn large btn-ghost icon-only burger" aria-controls="docs-nav" aria-expanded="false" aria-label="Open navigation" data-nav-toggle type="button">
+		{% include icon.html name="bars" %}
+	</button>
+
+	<a class="lockup" aria-label="Reduck docs" href="{{ '/' | relative_url }}">
+		<img alt="Reduck docs" height="22" src="{{ '/assets/img/reduck-docs.svg' | relative_url }}" width="176" />
+	</a>
+
+	<div class="search field large">
+		{% include icon.html name="search" class="field-icon" %}
+		<input aria-label="Search the docs" data-search-trigger placeholder="Search the docs..." readonly type="search" />
+		<kbd aria-hidden="true" data-search-chord>⌘ K</kbd>
+	</div>
+
+	<a class="btn large btn-secondary back" href="{{ site.app_url }}">
+		{% include icon.html name="arrow-left" %}
+		Back to Reduck
+	</a>
+</header>

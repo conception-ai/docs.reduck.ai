@@ -1,0 +1,61 @@
+{%- comment -%}
+  One page of prose, as the list of blocks `_plugins/reduck_docs.rb` cut it into. A fence, a
+  callout and a run of numbered steps each stand outside the prose because each wears a frame of
+  its own.
+
+  Usage: {% include blocks.html blocks=page.blocks %}
+{%- endcomment -%}
+{%- for block in include.blocks -%}
+	{%- case block.kind -%}
+	{%- when "code" -%}
+		<div class="code-block">
+			<button class="copy" aria-label="Copy code" data-copy type="button">{% include icon.html name="copy" %}</button>
+			<pre>{{ block.html }}</pre>
+		</div>
+	{%- when "banner" -%}
+		<div class="banner {{ block.variant }}">
+			{% include icon.html name=block.icon class="banner-icon" %}
+			<div class="banner-content">{{ block.html }}</div>
+		</div>
+	{%- when "steps" -%}
+		<ol class="steps">
+			{%- for item in block.items -%}<li>{{ item }}</li>{%- endfor -%}
+		</ol>
+	{%- when "tabs" -%}
+		<div class="docs-tabs" data-tabs>
+			<nav class="bar" aria-label="Choose how to install">
+				<ul>
+					{%- for tab in block.tabs -%}
+						<li>
+							<a class="tab{% if forloop.first %} toggled{% endif %}" aria-controls="{{ tab.id }}" data-tab="{{ tab.id }}" href="#{{ tab.id }}">{{ tab.label }}</a>
+						</li>
+					{%- endfor -%}
+				</ul>
+			</nav>
+			{%- for tab in block.tabs -%}
+				<div class="panel docs-prose" id="{{ tab.id }}" {% unless forloop.first %}hidden{% endunless %}>
+					{% include blocks.html blocks=tab.blocks %}
+				</div>
+			{%- endfor -%}
+		</div>
+	{%- when "tiles" -%}
+		<ul class="docs-tiles">
+			{%- for tile in block.tiles -%}
+				<li>
+					<a href="{{ tile.href }}">
+						{%- if tile.icon -%}
+							<img class="mark" alt="" height="24" src="{{ '/assets/img/brands/' | append: tile.icon | append: '.svg' | relative_url }}" width="24" />
+						{%- endif -%}
+						<span class="text">
+							<span class="label">{{ tile.label }}</span>
+							{%- if tile.note != "" -%}<span class="note">{{ tile.note }}</span>{%- endif -%}
+						</span>
+						{% include icon.html name="arrow-right" class="chevron" %}
+					</a>
+				</li>
+			{%- endfor -%}
+		</ul>
+	{%- else -%}
+		<div class="docs-prose">{{ block.html }}</div>
+	{%- endcase -%}
+{%- endfor -%}

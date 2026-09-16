@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+    push:
+        branches: [main]
+    # The API reference is drawn from the app's OpenAPI document, which is fetched at build time.
+    # A daily build is what keeps it in step with an app that ships without touching this
+    # repository.
+    schedule:
+        - cron: "17 4 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+# One deploy at a time, and a run already queued is dropped rather than made to wait: the newer
+# build is the one worth publishing. A run in flight is left to finish so Pages is never handed a
+# half-built artifact.
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.3"
+                  bundler-cache: true
+
+            - name: Refresh the OpenAPI document
+              # The app serves it without CORS headers, so a browser on this domain cannot read it
+              # and the copy in `assets/` is what the page opens. `servers` is rewritten because
+              # the document names `/`, which on this domain points at a site that serves no API.
+              # A fetch that fails leaves the committed copy in place rather than failing the
+              # build: stale endpoints beat no reference at all.
+              run: |
+                  if curl -fsS --max-time 30 https://reduck.ai/api/openapi.json -o /tmp/openapi.json; then
+                    python3 -c 'import json,sys; spec=json.load(open("/tmp/openapi.json")); spec["servers"]=[{"url":"https://reduck.ai"}]; json.dump(spec, open("assets/openapi.json","w"), indent=2)'
+                    echo "OpenAPI document refreshed."
+                  else
+                    echo "::warning::reduck.ai/api/openapi.json could not be read; keeping the committed copy."
+                  fi
+
+            - uses: actions/configure-pages@v5
+
+            - name: Build
+              run: bundle exec jekyll build
+              env:
+                  JEKYLL_ENV: production
+
+            - uses: actions/upload-pages-artifact@v3
+              with:
+                  path: _site
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - id: deployment
+              uses: actions/deploy-pages@v4

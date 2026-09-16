@@ -1,0 +1,441 @@
+# frozen_string_literal: true
+
+require "json"
+require "rouge"
+
+# The reader that turns a page of the content repository into what the layouts render.
+#
+# A page is markdown with front matter, exactly as `docs-content-template` describes it, so a file
+# written for the app renders here unchanged. Three things markdown has no syntax for are read
+# here rather than in a layout:
+#
+#   * `:::tabs` / `::tab` — alternatives a reader picks between
+#   * `:::tiles` / `::tile` — a grid of links, each card clickable as a whole
+#   * `::tiles-from <slug>` — the tiles another page owns, copied in before the page is read
+#
+# A page also comes apart into blocks rather than into one string of HTML: a fence, a callout and
+# a run of numbered steps each carry a frame of their own, which they cannot wear while they are
+# still inside the prose.
+module ReduckDocs
+	# What a run of prose is cut at. Only one starting at the start of a line counts — an indented
+	# fence belongs to the list item holding it, and stays in the prose so it renders inside that
+	# item.
+	BLOCK = /
+		^```([^\n]*)\r?\n(.*?)^```[ \t]*$
+		|^((?:>[^\n]*(?:\r?\n|$))+)
+		|^((?:\d+\.[ \t]+[^\n]*(?:\r?\n[ \t]+[^\n]*)*(?:\r?\n|$))+)
+	/mx
+
+	# Where one numbered item ends and the next begins.
+	STEP = /^\d+\.[ \t]+/
+
+	# An item of a tight list is one run of inline markdown, and the `<p>` kramdown puts around it
+	# would take the spacing the prose gives a paragraph.
+	LONE_PARAGRAPH = %r{\A<p>(.*)</p>\s*\z}m
+
+	# GitHub's alert syntax, which says what kind of callout a blockquote is. A blockquote that
+	# opens with none is a note.
+	ALERT = /\A\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*\r?\n?/
+
+	ALERT_VARIANTS = {
+		"NOTE" => "info",
+		"IMPORTANT" => "info",
+		"TIP" => "success",
+		"WARNING" => "warning",
+		"CAUTION" => "danger"
+	}.freeze
+
+	BANNER_ICONS = {
+		"info" => "info",
+		"success" => "circle-check",
+		"warning" => "triangle-warning",
+		"danger" => "circle-xmark"
+	}.freeze
+
+	GROUP_OPEN = /^:::(tabs|tiles)[ \t]*$/
+	GROUP_CLOSE = /^:::[ \t]*$/
+	TAB_OPENER = /^::tab[ \t]+(.+?)[ \t]*$/
+	TILE_OPENER = /^::tile[ \t]+(.+?)[ \t]*$/
+	TILE_LINK = /\A\[([^\]]+)\]\(([^)]+)\)(?:[ \t]+icon:([a-z0-9_-]+))?\z/i
+	TILES_FROM = /^::tiles-from[ \t]+([a-z0-9-]+)[ \t]*$/
+
+	# The languages a grammar is loaded for; any other fence renders uncoloured, in the same frame.
+	HIGHLIGHTED = %w[bash typescript json toml].freeze
+
+	# A link written for the app, which serves the docs under a path, read on the site that serves
+	# them at its root.
+	APP_DOCS_LINK = %r{\]\(/docs(?:/([a-z0-9\-/]*))?(#[^)]*)?\)}
+
+	class Reader
+		def initialize(site)
+			@site = site
+			@markdown = site.find_converter_instance(Jekyll::Converters::Markdown)
+			@formatter = Rouge::Formatters::HTML.new
+		end
+
+		# The page, as the list of blocks a layout walks.
+		def blocks(slug, body, allow_tabs: true)
+			out = []
+			group = 0
+
+			segments(body).each do |segment|
+				case segment[:kind]
+				when "text"
+					prose(slug, segment[:body], out)
+				when "tabs"
+					unless allow_tabs
+						prose(slug, ":::tabs\n#{segment[:body]}\n:::", out)
+						next
+					end
+					tabs = tabs_of(slug, segment[:body], group)
+					tabs.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tabs", "id" => "tabs-#{group}", "tabs" => tabs }
+					group += 1
+				when "tiles"
+					tiles = tiles_of(segment[:body])
+					tiles.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tiles", "tiles" => tiles }
+				end
+			end
+
+			out
+		end
+
+		# The tiles a page owns, for `::tiles-from` to copy. Read off the page as it was written,
+		# so a page that borrows its tiles in turn holds none of its own: one hop only.
+		def tiles_group(body)
+			segments(body).find { |segment| segment[:kind] == "tiles" }&.fetch(:body)
+		end
+
+		private
+
+		# The body, cut into prose and groups. Counting the fences rather than matching a pair of
+		# them is what lets a tiles group sit inside a tab: a non-greedy match would end the tab
+		# group at the first `:::` it met, which is the inner one.
+		def segments(body)
+			out = []
+			text = []
+			group = nil
+
+			flush = lambda do
+				out << { kind: "text", body: text.join("\n") } unless text.join("\n").strip.empty?
+				text = []
+			end
+
+			body.split(/\r?\n/).each do |line|
+				opener = GROUP_OPEN.match(line)
+
+				if group.nil?
+					if opener
+						flush.call
+						group = { kind: opener[1], lines: [], depth: 1 }
+					else
+						text << line
+					end
+					next
+				end
+
+				if opener then group[:depth] += 1
+				elsif GROUP_CLOSE.match?(line) then group[:depth] -= 1
+				end
+
+				if group[:depth].zero?
+					out << { kind: group[:kind], body: group[:lines].join("\n") }
+					group = nil
+				else
+					group[:lines] << line
+				end
+			end
+
+			# A group left open at the end of the page never said where it stops, so it is prose.
+			text.push(":::#{group[:kind]}", *group[:lines]) if group
+			flush.call
+			out
+		end
+
+		# A run of markdown, cut at each fence, each callout and each run of steps. Each becomes a
+		# block of its own so it can wear the frame it needs — the copy button, the callout's
+		# colour, the joined dots of a numbered list.
+		def prose(slug, markdown, out)
+			cursor = 0
+			markdown.to_enum(:scan, BLOCK).each do
+				match = Regexp.last_match
+				push_html(slug, markdown[cursor...match.begin(0)], out)
+				cursor = match.end(0)
+
+				info, fenced, quote, steps = match.captures
+
+				if quote
+					quoted = quote.gsub(/^>[ \t]?/, "").strip
+					alert = ALERT.match(quoted)
+					variant = alert ? ALERT_VARIANTS[alert[1]] : "info"
+					out << {
+						"kind" => "banner",
+						"variant" => variant,
+						"icon" => BANNER_ICONS[variant],
+						"html" => render(slug, quoted.sub(ALERT, ""))
+					}
+					next
+				end
+
+				if steps
+					items = steps.split(STEP).drop(1).map do |item|
+						# The wrap of a line is indented to sit under its number, which is layout
+						# in the source and would read as a code block once the marker is gone.
+						html = render(slug, item.gsub(/^[ \t]+/, "").strip)
+						LONE_PARAGRAPH.match(html)&.captures&.first || html
+					end
+					out << { "kind" => "steps", "items" => items } unless items.empty?
+					next
+				end
+
+				lang = info.to_s.strip
+				out << {
+					"kind" => "code",
+					"code" => fenced.to_s.sub(/\r?\n\z/, ""),
+					"html" => highlight(fenced.to_s.sub(/\r?\n\z/, ""), lang)
+				}
+			end
+			push_html(slug, markdown[cursor..], out)
+		end
+
+		def push_html(slug, markdown, out)
+			return if markdown.nil? || markdown.strip.empty?
+
+			out << { "kind" => "html", "html" => render(slug, markdown) }
+		end
+
+		def render(slug, markdown)
+			html = @markdown.convert(rewrite_links(markdown))
+			# An image is written beside the page that uses it, so its source is a bare file name.
+			# The page it renders on may be served from another path — `overview` answers at the
+			# root — so each is resolved against the page's own folder rather than the URL.
+			html.gsub(/(<img[^>]*\bsrc=")(?!https?:|data:|\/)([^"]+)(")/) do
+				"#{Regexp.last_match(1)}#{@site.baseurl}/#{slug}/#{Regexp.last_match(2)}#{Regexp.last_match(3)}"
+			end
+		end
+
+		def rewrite_links(markdown)
+			markdown.gsub(APP_DOCS_LINK) do
+				slug = Regexp.last_match(1)
+				hash = Regexp.last_match(2)
+				path = slug.nil? || slug.empty? ? "/" : "/#{slug}/"
+				"](#{@site.baseurl}#{path}#{hash})"
+			end
+		end
+
+		def highlight(code, lang)
+			return escape(code) unless HIGHLIGHTED.include?(lang)
+
+			lexer = Rouge::Lexer.find_fancy(lang)
+			lexer ? @formatter.format(lexer.lex(code)) : escape(code)
+		end
+
+		def escape(text)
+			text.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;")
+		end
+
+		def slugify_label(label)
+			slug = label.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-|-\z/, "")
+			slug.empty? ? "tab" : slug
+		end
+
+		def tabs_of(slug, body, group)
+			parts = body.split(TAB_OPENER)
+			tabs = []
+			# `split` on a capturing pattern yields [before, label, content, …]; the leading run is
+			# whatever sat above the first `::tab`, which has nowhere to go.
+			(1...parts.length).step(2) do |i|
+				label = parts[i].to_s.strip
+				next if label.empty?
+
+				tabs << {
+					"id" => "tabs-#{group}-#{slugify_label(label)}",
+					"label" => label,
+					# Tiles only: a tab is already a choice, and a second bar of them inside one
+					# would be a choice about a choice.
+					"blocks" => blocks(slug, parts[i + 1].to_s, allow_tabs: false)
+				}
+			end
+			tabs
+		end
+
+		def tiles_of(body)
+			parts = body.split(TILE_OPENER)
+			tiles = []
+			(1...parts.length).step(2) do |i|
+				link = TILE_LINK.match(parts[i].to_s.strip)
+				# A tile whose line is not a link has no destination, and a tile with no
+				# destination is not a tile: it is dropped rather than drawn as a card that does
+				# nothing.
+				next unless link
+
+				label, href, icon = link.captures
+				next if label.to_s.empty? || href.to_s.empty?
+
+				tile = {
+					"label" => label,
+					"href" => rewrite_href(href),
+					"note" => parts[i + 1].to_s.strip.gsub(/\s+/, " ")
+				}
+				tile["icon"] = icon if icon
+				tiles << tile
+			end
+			tiles
+		end
+
+		def rewrite_href(href)
+			return href unless href.start_with?("/docs")
+
+			rest = href.delete_prefix("/docs").delete_prefix("/")
+			rest.empty? ? "#{@site.baseurl}/" : "#{@site.baseurl}/#{rest.chomp('/')}/"
+		end
+	end
+
+	class Generator < Jekyll::Generator
+		safe true
+		priority :high
+
+		def generate(site)
+			collection = site.collections["docs"]
+			return if collection.nil?
+
+			reader = Reader.new(site)
+			index_slug = site.config["index_slug"] || "overview"
+
+			pages = collection.docs.map do |doc|
+				slug = File.basename(File.dirname(doc.relative_path))
+				doc.data["slug"] = slug
+				doc.data["permalink"] = slug == index_slug ? "/" : "/#{slug}/"
+				doc
+			end
+
+			# Read first, copy second: `::tiles-from` names another page, which has to be in hand
+			# before the page borrowing from it is read.
+			owned = pages.to_h { |doc| [doc.data["slug"], reader.tiles_group(doc.content)] }
+
+			pages.each do |doc|
+				body = doc.content.gsub(TILES_FROM) do
+					group = owned[Regexp.last_match(1)]
+					if group.nil?
+						Jekyll.logger.warn "Docs:", "::tiles-from names \"#{Regexp.last_match(1)}\", which holds no tiles group"
+						""
+					else
+						":::tiles\n#{group}\n:::"
+					end
+				end
+
+				doc.data["blocks"] = reader.blocks(doc.data["slug"], body)
+				doc.data["search_text"] = plain_text(doc.data["blocks"])
+				doc.data["search_headings"] = headings(doc.data["blocks"])
+
+				# Every layout reads `page.blocks`; leaving the markdown in place would only have
+				# kramdown convert it a second time, to output nothing renders.
+				doc.content = ""
+			end
+
+			site.data["nav"] = nav(site, pages)
+			link_next(site.data["nav"], pages)
+			site.pages << search_index(site, pages)
+		end
+
+		private
+
+		# The nav panel: the published pages grouped under their section, each section in the order
+		# the config fixes and each page in the order its front matter asked for. A section no page
+		# claims is left out, so an empty heading never renders.
+		def nav(site, pages)
+			listed = pages.reject { |doc| doc.data["draft"] }
+				.sort_by { |doc| [doc.data["order"].to_i, doc.data["title"].to_s] }
+
+			nested = site.config["nested_under"] || {}
+			sections = (site.config["sections"] || []).map do |section|
+				{
+					"id" => section["id"],
+					"label" => section["label"],
+					"pages" => listed.select { |doc| doc.data["section"] == section["id"] }.map { |doc| entry(doc) }
+				}
+			end
+
+			nested.each do |section_id, hub_slug|
+				group = sections.find { |section| section["id"] == section_id }
+				hub = sections.flat_map { |section| section["pages"] }.find { |page| page["slug"] == hub_slug }
+				next if group.nil? || group["pages"].empty? || hub.nil?
+
+				hub["children"] = group["pages"]
+				group["pages"] = []
+			end
+
+			sections.reject { |section| section["pages"].empty? }
+		end
+
+		def entry(doc)
+			{
+				"slug" => doc.data["slug"],
+				"title" => doc.data["title"],
+				"url" => doc.url,
+				"section" => doc.data["section"]
+			}
+		end
+
+		# The page that follows this one in the panel, reading the sections top to bottom as a
+		# single list. The last page of the docs has none, and so shows no way on.
+		def link_next(sections, pages)
+			flat = sections.flat_map { |section| section["pages"].flat_map { |page| [page, *(page["children"] || [])] } }
+			by_slug = pages.to_h { |doc| [doc.data["slug"], doc] }
+
+			flat.each_with_index do |page, i|
+				following = flat[i + 1]
+				next if following.nil?
+
+				by_slug[page["slug"]]&.data&.[]=("next_page", following)
+			end
+		end
+
+		def search_index(site, pages)
+			entries = pages.reject { |doc| doc.data["draft"] || doc.data["search"] == false }.map do |doc|
+				{
+					url: doc.url,
+					title: doc.data["title"],
+					section: doc.data["section"],
+					headings: doc.data["search_headings"],
+					text: doc.data["search_text"]
+				}
+			end
+
+			page = Jekyll::PageWithoutAFile.new(site, site.source, "", "search.json")
+			page.content = JSON.generate(entries)
+			page.data["layout"] = nil
+			page.data["sitemap"] = false
+			page
+		end
+
+		def plain_text(blocks)
+			blocks.flat_map { |block| strings(block) }
+				.join(" ")
+				.gsub(/<[^>]+>/, " ")
+				.gsub(/&[a-z]+;/, " ")
+				.gsub(/\s+/, " ")
+				.strip
+		end
+
+		def strings(block)
+			case block["kind"]
+			when "html", "banner" then [block["html"]]
+			when "steps" then block["items"]
+			when "code" then [block["code"]]
+			when "tabs" then block["tabs"].flat_map { |tab| [tab["label"], *tab["blocks"].flat_map { |inner| strings(inner) }] }
+			when "tiles" then block["tiles"].flat_map { |tile| [tile["label"], tile["note"]] }
+			else []
+			end
+		end
+
+		# `h2` and `h3` are what a page's structure is, so they rank a hit above the prose under
+		# them and below the title.
+		def headings(blocks)
+			blocks.select { |block| block["kind"] == "html" }
+				.flat_map { |block| block["html"].scan(%r{<h[23][^>]*>(.*?)</h[23]>}m) }
+				.flatten
+				.map { |heading| heading.gsub(/<[^>]+>/, "").strip }
+				.reject(&:empty?)
+		end
+	end
+end

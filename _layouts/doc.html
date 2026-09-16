@@ -1,0 +1,25 @@
+---
+layout: docs-shell
+---
+
+{%- assign section_label = "" -%}
+{%- for section in site.sections -%}
+	{%- if section.id == page.section %}{% assign section_label = section.label %}{% endif -%}
+{%- endfor -%}
+
+<article class="docs-article">
+	<p class="section">{{ section_label }}</p>
+	<h1>{{ page.title }}</h1>
+
+	{% include blocks.html blocks=page.blocks %}
+
+	{%- if page.next_page -%}
+		<nav class="docs-next" aria-label="Next page">
+			<p class="label">Next</p>
+			<a class="btn large btn-secondary" href="{{ page.next_page.url | relative_url }}">
+				{% include icon.html name="arrow-right" %}
+				{{ page.next_page.title }}
+			</a>
+		</nav>
+	{%- endif -%}
+</article>

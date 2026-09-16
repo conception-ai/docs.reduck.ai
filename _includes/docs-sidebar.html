@@ -1,0 +1,45 @@
+{%- comment -%}
+  The panel of pages. A hub's list opens on its own only when the page the reader is on is one of
+  the pages beneath it — going to the hub is reading it, not asking what it holds, and the chevron
+  is what asks that.
+{%- endcomment -%}
+<div class="docs-scrim" data-nav-scrim></div>
+
+<nav class="docs-sidebar" id="docs-nav" aria-label="Documentation">
+	{%- for section in site.data.nav -%}
+		<section>
+			<h2>{{ section.label }}</h2>
+			<ul>
+				{%- for entry in section.pages -%}
+					{%- assign is_current = false -%}
+					{%- if entry.slug == page.slug %}{% assign is_current = true %}{% endif -%}
+					{%- assign holds_current = false -%}
+					{%- for child in entry.children -%}
+						{%- if child.slug == page.slug %}{% assign holds_current = true %}{% endif -%}
+					{%- endfor -%}
+					<li>
+						<div class="row">
+							<a class="nav-link{% if is_current %} toggled{% endif %}" {% if is_current %}aria-current="page"{% endif %} href="{{ entry.url | relative_url }}">{{ entry.title }}</a>
+							{%- if entry.children -%}
+								<button class="disclosure" aria-controls="nav-{{ entry.slug }}" aria-expanded="{{ holds_current }}" aria-label="Show pages under {{ entry.title }}" data-disclosure type="button">
+									{% include icon.html name="chevron-right" %}
+								</button>
+							{%- endif -%}
+						</div>
+						{%- if entry.children -%}
+							<ul class="children" id="nav-{{ entry.slug }}" {% unless holds_current %}hidden{% endunless %}>
+								{%- for child in entry.children -%}
+									{%- assign child_current = false -%}
+									{%- if child.slug == page.slug %}{% assign child_current = true %}{% endif -%}
+									<li>
+										<a class="nav-link{% if child_current %} toggled{% endif %}" {% if child_current %}aria-current="page"{% endif %} href="{{ child.url | relative_url }}">{{ child.title }}</a>
+									</li>
+								{%- endfor -%}
+							</ul>
+						{%- endif -%}
+					</li>
+				{%- endfor -%}
+			</ul>
+		</section>
+	{%- endfor -%}
+</nav>

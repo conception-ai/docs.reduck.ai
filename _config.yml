@@ -1,0 +1,68 @@
+title: Reduck docs
+description: >-
+  How to connect an agent to Reduck, run a script on a real browser, and write one for a site the
+  official library does not cover yet.
+url: https://docs.reduck.ai
+app_url: https://reduck.ai
+discord_url: https://discord.gg/reduck
+lang: en
+
+collections:
+    docs:
+        output: true
+        # Never the address of a page — `_plugins/reduck_docs.rb` writes each one from its folder
+        # name. It is here because the same setting decides where an image beside a page is
+        # written, and the default puts it under a `/docs/` prefix this site has no room for.
+        permalink: /:path/
+
+# The page a reader lands on. It is served at `/` rather than at `/overview/`, so the front of the
+# docs has one address and not two.
+index_slug: overview
+
+# The sections of the nav panel, in the order they appear. Which parts the docs are cut into is a
+# decision about the product: a writer chooses which section a page joins, not which sections
+# exist.
+sections:
+    - id: get-started
+      label: Get started
+    - id: connect
+      label: Connect your agent
+    - id: core-concepts
+      label: Core concepts
+    - id: using-reduck
+      label: Using Reduck
+    - id: security
+      label: Security
+
+# A page that holds a whole section beneath it in the panel rather than beside it: the hub and the
+# pages it leads to read as one entry the reader opens. Where the hub is missing the section still
+# stands on its own, so the content loses the nesting and not the pages.
+nested_under:
+    connect: connect-your-agent
+
+markdown: kramdown
+
+kramdown:
+    input: GFM
+    hard_wrap: false
+    syntax_highlighter: rouge
+
+plugins:
+    - jekyll-sitemap
+
+sass:
+    style: compressed
+
+exclude:
+    - Gemfile
+    - Gemfile.lock
+    - README.md
+    - vendor
+    - .github
+
+defaults:
+    - scope:
+          path: ""
+          type: docs
+      values:
+          layout: doc

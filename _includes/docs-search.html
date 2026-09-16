@@ -1,0 +1,27 @@
+{%- comment -%}
+  The palette ⌘K opens. Its corpus is `/search.json`, fetched on the first open rather than with
+  the page: a reader who never searches should not pay for it, and one who does pays once.
+{%- endcomment -%}
+<dialog class="docs-search" aria-label="Search the docs" data-search-dialog>
+	<div class="field-row">
+		<div class="field large">
+			{% include icon.html name="search" class="field-icon" %}
+			<input aria-label="Search the docs" data-search-input placeholder="Search the docs..." type="search" />
+		</div>
+	</div>
+	<div class="results" data-search-results>
+		<p class="empty">Type to search the documentation.</p>
+	</div>
+</dialog>
+
+{%- comment -%}
+  A hit says which part of the docs it is in, and the labels for that live in the config rather
+  than in the index — the same page under a renamed section should not mean rebuilding the corpus.
+{%- endcomment -%}
+<script type="application/json" data-section-labels>
+	{
+	{%- for section in site.sections -%}
+		"{{ section.id }}": {{ section.label | jsonify }}{% unless forloop.last %},{% endunless %}
+	{%- endfor -%}
+	}
+</script>
