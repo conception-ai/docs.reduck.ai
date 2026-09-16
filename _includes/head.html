@@ -12,8 +12,18 @@
 <title>{{ head_title }}</title>
 <meta content="{{ page_desc | strip_newlines }}" name="description" />
 <link href="{{ page.url | absolute_url }}" rel="canonical" />
-{%- if page.robots %}
-<meta content="{{ page.robots }}" name="robots" />
+{%- comment -%}
+  The staged build describes a release that is not out. Its pages answer on the public domain, so
+  the tag is what keeps a reader searching for an answer from landing on one they cannot use;
+  `robots.txt` at the root of the domain says the same to a crawler that asks first.
+{%- endcomment -%}
+{%- if site.staging -%}
+	{%- assign robots = "noindex, nofollow" -%}
+{%- else -%}
+	{%- assign robots = page.robots -%}
+{%- endif -%}
+{%- if robots %}
+<meta content="{{ robots }}" name="robots" />
 {%- endif %}
 
 <meta content="{{ head_title }}" property="og:title" />

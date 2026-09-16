@@ -1,0 +1,11 @@
+{%- comment -%}
+  The strip the staged build wears and the released one does not. Both sites are docs.reduck.ai,
+  one path apart, so the address is the only other thing that tells a reader which of the two
+  they are reading.
+{%- endcomment -%}
+{%- if site.staging %}
+<div class="staging-banner">
+	<span>Staged documentation — the next release, not what is live.</span>
+	<a href="{{ site.url }}/">Read the published docs</a>
+</div>
+{%- endif %}

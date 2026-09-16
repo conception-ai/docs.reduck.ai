@@ -1,0 +1,54 @@
+name: PR Check
+
+# What gates a merge. A docs pull request targeting `staging` is merged by automation in the code
+# repository the moment its code pull request lands, so this check is the only thing between a
+# page that does not build and the published site.
+on:
+    pull_request:
+        branches: [main, staging]
+        types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+    contents: read
+
+concurrency:
+    group: pr-check-${{ github.head_ref }}
+    cancel-in-progress: true
+
+jobs:
+    build:
+        name: Build docs
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.3"
+                  bundler-cache: true
+
+            # Both shapes the branch can be published in. A pull request lands on `staging`
+            # first and reaches `main` later, so a page that builds at the root and not under a
+            # path — or the other way round — is caught here either way.
+            - name: Build at the root
+              env:
+                  JEKYLL_ENV: production
+              run: bundle exec jekyll build --destination _site-root
+
+            - name: Build under /staging/
+              env:
+                  JEKYLL_ENV: production
+              run: bundle exec jekyll build --config _config.yml,_config.staging.yml --destination _site-staging
+
+            # A link the staged build leaves pointing at the root leaves the staged site without
+            # a word: the reader is on the released docs and nothing said so.
+            - name: Check the staged build keeps its path
+              run: |
+                  escaped=$(grep -rhoE '(href|src)="/[^"]*"' _site-staging --include='*.html' |
+                    grep -v '"/staging' | sort -u || true)
+                  if [ -n "$escaped" ]; then
+                    echo "::error::These links leave /staging/ and land on the released docs:"
+                    echo "$escaped"
+                    exit 1
+                  fi
+                  echo "Every link in the staged build stays under /staging/."
