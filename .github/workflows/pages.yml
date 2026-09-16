@@ -1,8 +1,12 @@
 name: Deploy
 
+# One deployment, two branches. Pages serves a single artifact, so the released docs and the
+# staged ones are built side by side and assembled into it: `main` at the root, `staging` under
+# `/staging/`. A push to either branch rebuilds both — publishing only the branch that moved
+# would mean replacing the other with nothing.
 on:
     push:
-        branches: [main]
+        branches: [main, staging]
     # The API reference is drawn from the app's OpenAPI document, which is fetched at build time.
     # A daily build is what keeps it in step with an app that ships without touching this
     # repository.
@@ -26,22 +30,37 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - name: Check out the released docs
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+                  path: released
 
+            - name: Check out the staged docs
+              uses: actions/checkout@v4
+              with:
+                  ref: staging
+                  path: staged
+
+            # No `bundler-cache`: it writes its configuration into one checkout, and there are
+            # two here. Each runs its own `bundle install` against the shared gem directory, so
+            # the second finds what the first installed and costs seconds.
             - uses: ruby/setup-ruby@v1
               with:
                   ruby-version: "3.3"
-                  bundler-cache: true
 
             - name: Refresh the OpenAPI document
               # The app serves it without CORS headers, so a browser on this domain cannot read it
               # and the copy in `assets/` is what the page opens. `servers` is rewritten because
               # the document names `/`, which on this domain points at a site that serves no API.
               # A fetch that fails leaves the committed copy in place rather than failing the
-              # build: stale endpoints beat no reference at all.
+              # build: stale endpoints beat no reference at all. Both builds read production's
+              # document — the staged docs are prose ahead of a release, not a second API.
               run: |
                   if curl -fsS --max-time 30 https://reduck.ai/api/openapi.json -o /tmp/openapi.json; then
-                    python3 -c 'import json,sys; spec=json.load(open("/tmp/openapi.json")); spec["servers"]=[{"url":"https://reduck.ai"}]; json.dump(spec, open("assets/openapi.json","w"), indent=2)'
+                    python3 -c 'import json; spec=json.load(open("/tmp/openapi.json")); spec["servers"]=[{"url":"https://reduck.ai"}]; json.dump(spec, open("/tmp/openapi.rewritten.json","w"), indent=2)'
+                    cp /tmp/openapi.rewritten.json released/assets/openapi.json
+                    cp /tmp/openapi.rewritten.json staged/assets/openapi.json
                     echo "OpenAPI document refreshed."
                   else
                     echo "::warning::reduck.ai/api/openapi.json could not be read; keeping the committed copy."
@@ -49,10 +68,25 @@ jobs:
 
             - uses: actions/configure-pages@v5
 
-            - name: Build
-              run: bundle exec jekyll build
+            - name: Build the released docs
+              working-directory: released
               env:
                   JEKYLL_ENV: production
+              run: |
+                  bundle install
+                  bundle exec jekyll build --destination "$GITHUB_WORKSPACE/_site"
+
+            # After the released build and into a folder of its own: Jekyll empties its
+            # destination before it writes, and the root is the other site's.
+            - name: Build the staged docs
+              working-directory: staged
+              env:
+                  JEKYLL_ENV: production
+              run: |
+                  bundle install
+                  bundle exec jekyll build \
+                    --config _config.yml,_config.staging.yml \
+                    --destination "$GITHUB_WORKSPACE/_site/staging"
 
             - uses: actions/upload-pages-artifact@v3
               with:

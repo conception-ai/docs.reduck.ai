@@ -1,0 +1,13 @@
+---
+sitemap: false
+---
+
+# The staged docs answer under /staging/ on this same domain, and they describe behaviour that is
+# not released. Only the file at the root of a domain is read, so this one — written by the build
+# of `main` — is what keeps them out of an index. `jekyll-sitemap` writes its own robots.txt only
+# when the source holds none, so adding this file replaces it and the Sitemap line below is the
+# one it would have written.
+User-agent: *
+Disallow: /staging/
+
+Sitemap: {{ '/sitemap.xml' | absolute_url }}

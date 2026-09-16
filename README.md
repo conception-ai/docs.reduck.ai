@@ -38,13 +38,13 @@ order: 20
 The prose starts here.
 ```
 
-| Field         | Required | What it does                                                             |
-| ------------- | -------- | ------------------------------------------------------------------------ |
-| `title`       | yes      | The page heading, and its entry in the nav panel                         |
-| `description` | yes      | The meta description, and the subtitle on a search hit                   |
-| `section`     | yes      | `get-started`, `connect`, `core-concepts`, `using-reduck` or `security`  |
-| `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30            |
-| `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index         |
+| Field         | Required | What it does                                                            |
+| ------------- | -------- | ----------------------------------------------------------------------- |
+| `title`       | yes      | The page heading, and its entry in the nav panel                        |
+| `description` | yes      | The meta description, and the subtitle on a search hit                  |
+| `section`     | yes      | `get-started`, `connect`, `core-concepts`, `using-reduck` or `security` |
+| `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
+| `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
 
 `_docs/overview/` is special: it is served at `/`, not at `/overview`, because it is where a
 reader lands. Give it the lowest `order` so it leads the nav.
@@ -142,13 +142,45 @@ an endpoint added to the app shows up here without a push.
 
 ## Publishing
 
-Push to `main`. GitHub Actions builds the site and deploys it to Pages, at `docs.reduck.ai`.
+Two branches, one domain:
+
+| Branch    | Address                   | What it holds                                |
+| --------- | ------------------------- | -------------------------------------------- |
+| `main`    | `docs.reduck.ai`          | The released product                         |
+| `staging` | `docs.reduck.ai/staging/` | The next release, merged but not yet shipped |
+
+A push to either branch runs `.github/workflows/pages.yml`, which checks out **both**, builds
+each, and deploys one artifact holding the two: `main` at the root, `staging` under `/staging/`.
+Pages serves a single artifact, so a build of only the branch that moved would replace the other
+with nothing.
+
+The staged build is the same site with `_config.staging.yml` laid over the config: a `baseurl`,
+the strip that says what the reader is looking at, and `noindex`. `robots.txt` — written by the
+build of `main`, which is the only one a crawler reads — keeps `/staging/` out of an index too.
+
+### Where a change goes
+
+A docs pull request targets **`staging`**, never `main`, and names the code change it documents:
+
+```text
+Code-PR: https://github.com/conception-ai/conception-clean-for-real/pull/1234
+```
+
+That line is read by `sync-docs-to-staging` in the code repository. When the code pull request is
+merged into code `staging`, this pull request is merged into docs `staging` and the staged docs
+are rebuilt. When code `staging` is released to code `main`, docs `staging` is released to docs
+`main` the same way. Git is the state: a page in `staging` belongs to the staged release, a page
+in `main` is live.
+
+A change that documents nothing in the code repository — a typo, a rewording, a missing page for
+something already shipped — needs no `Code-PR:` line. Target `staging` anyway and merge it; it
+goes out with the next release.
 
 ## Layout
 
-| Path                      | What it holds                                                    |
+| Path                      | What it holds                                                     |
 | ------------------------- | ----------------------------------------------------------------- |
-| `_docs/`                  | One folder per page: the markdown and the images beside it       |
+| `_docs/`                  | One folder per page: the markdown and the images beside it        |
 | `_plugins/reduck_docs.rb` | The reader: tabs, tiles, callouts, steps, the nav tree, the index |
 | `_layouts/`, `_includes/` | The shell — the site header, the docs bar, the panel, the palette |
 | `assets/css/`             | `tokens.css` is the app's palette and type scale, restated        |

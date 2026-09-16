@@ -3,6 +3,9 @@
 (() => {
 	"use strict";
 
+	// Where this copy of the site is served from: nothing at the root, `/staging` for the staged
+	// build. The search index holds each page's path and not its address, so a hit is only a link
+	// once this is in front of it.
 	const BASE = document.documentElement.dataset.baseurl || "";
 
 	/* ------------------------------------------------------------ the panel */
@@ -185,7 +188,7 @@
 
 		results.innerHTML = `<ul>${hits
 			.map(
-				(hit, i) => `<li><a class="${i === active ? "active" : ""}" href="${hit.entry.url}">
+				(hit, i) => `<li><a class="${i === active ? "active" : ""}" href="${BASE}${hit.entry.url}">
 					<span class="row">
 						<span class="title">${escape(hit.entry.title)}</span>
 						<span class="section">${escape(SECTION_LABELS[hit.entry.section] ?? "")}</span>
@@ -234,7 +237,7 @@
 		} else if (event.key === "Enter") {
 			event.preventDefault();
 			const hit = hits[active];
-			if (hit) window.location.href = hit.entry.url;
+			if (hit) window.location.href = `${BASE}${hit.entry.url}`;
 		}
 	});
 

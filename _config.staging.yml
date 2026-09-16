@@ -1,0 +1,5 @@
+# The overlay the staged build adds on top of `_config.yml`. Two branches of this repository are
+# published to one domain — `main` at the root, `staging` one path along — so the only thing that
+# separates the two sites is what is set here.
+baseurl: /staging
+staging: true

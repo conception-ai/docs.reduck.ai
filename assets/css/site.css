@@ -213,6 +213,28 @@
 	border-radius: 12px;
 }
 
+/* ---------------------------------------------------------------- the staged-docs strip */
+
+.staging-banner {
+	align-items: center;
+	background: var(--color-orange-500-translucent-18);
+	border-bottom: 1px solid var(--color-orange-500);
+	color: var(--color-orange-100);
+	display: flex;
+	flex-wrap: wrap;
+	font-size: var(--font-size-small);
+	gap: 4px 12px;
+	justify-content: center;
+	padding: 8px 16px;
+	text-align: center;
+	width: 100%;
+}
+
+.staging-banner a {
+	color: inherit;
+	font-weight: 600;
+}
+
 /* ---------------------------------------------------------------- the site header */
 
 .site-header {
