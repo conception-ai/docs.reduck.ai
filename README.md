@@ -166,15 +166,26 @@ A docs pull request targets **`staging`**, never `main`, and names the code chan
 Code-PR: https://github.com/conception-ai/conception-clean-for-real/pull/1234
 ```
 
-That line is read by `sync-docs-to-staging` in the code repository. When the code pull request is
-merged into code `staging`, this pull request is merged into docs `staging` and the staged docs
-are rebuilt. When code `staging` is released to code `main`, docs `staging` is released to docs
-`main` the same way. Git is the state: a page in `staging` belongs to the staged release, a page
-in `main` is live.
+That line is read by `.github/workflows/docs-sync.yml` in the code repository. When the code pull
+request is merged into code `staging`, this pull request is merged into docs `staging` and the
+staged docs are rebuilt. When code `staging` is released to code `main`, docs `staging` is
+released to docs `main` the same way. Git is the state: a page in `staging` belongs to the staged
+release, a page in `main` is live.
 
 A change that documents nothing in the code repository — a typo, a rewording, a missing page for
 something already shipped — needs no `Code-PR:` line. Target `staging` anyway and merge it; it
 goes out with the next release.
+
+### Four settings that are not in this repository
+
+Each one breaks the flow in a way no file here shows, so they are written down:
+
+| Where                                  | What                                          | What breaks without it                                                                 |
+| -------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Settings → Environments → github-pages | `main` **and** `staging` in the branch policy | A push to `staging` builds and is then refused at the deploy step                      |
+| Settings → General → Pull Requests     | Allow auto-merge                              | The code repository cannot queue a merge, and its run fails                            |
+| Branch protection, `main` + `staging`  | Require the `Build docs` check                | Auto-merge has nothing to wait for, so an unbuilt page reaches the site                |
+| Code repo → Secrets → Actions          | `DOCS_SYNC_TOKEN`                             | Nothing here moves and nothing anywhere says so — the two sites drift apart in silence |
 
 ## Layout
 
