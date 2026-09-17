@@ -2,14 +2,14 @@
 layout: docs-shell
 ---
 
-{%- assign section_label = "" -%}
-{%- for section in site.sections -%}
-	{%- if section.id == page.section %}{% assign section_label = section.label %}{% endif -%}
-{%- endfor -%}
-
 <article class="docs-article">
-	<p class="section">{{ section_label }}</p>
-	<h1>{{ page.title }}</h1>
+	<header>
+		<h1>{{ page.title }}</h1>
+		<button class="btn medium btn-secondary" aria-label="Copy this page as markdown" data-copy="{{ page.url | relative_url | append: 'index.md' }}" type="button">
+			{% include icon.html name="copy" %}
+			Copy page
+		</button>
+	</header>
 
 	{% include blocks.html blocks=page.blocks %}
 

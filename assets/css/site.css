@@ -715,10 +715,10 @@
 	padding: 0;
 }
 
+/* The rail and the numerals only. The type is the surrounding prose's, so a step reads like the
+   paragraph above it. */
 .steps > li {
-	color: var(--color-grey-200);
 	counter-increment: step;
-	line-height: 1.6;
 	padding: 0.5lh 0 0.5lh 1.5lh;
 	position: relative;
 }
@@ -749,19 +749,4 @@
 	position: absolute;
 	top: 0.5lh;
 	width: 1px;
-}
-
-.steps > li a {
-	color: var(--color-grey-50);
-	font-weight: 500;
-	text-decoration: underline;
-}
-
-.steps > li code {
-	background: var(--color-grey-800);
-	border-radius: 4px;
-	color: var(--color-grey-300);
-	font-family: var(--font-mono);
-	font-size: var(--font-size-body);
-	padding: 2px 6px;
 }

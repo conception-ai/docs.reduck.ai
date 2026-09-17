@@ -18,12 +18,13 @@ require "rouge"
 # still inside the prose.
 module ReduckDocs
 	# What a run of prose is cut at. Only one starting at the start of a line counts — an indented
-	# fence belongs to the list item holding it, and stays in the prose so it renders inside that
-	# item.
+	# fence belongs to the step holding it. A step runs on through every indented line that
+	# follows its number, and blank lines — inside a step or between two — do not end the run, so
+	# a fence or a tiles group written under a step stays inside it and the steps stay one run.
 	BLOCK = /
 		^```([^\n]*)\r?\n(.*?)^```[ \t]*$
 		|^((?:>[^\n]*(?:\r?\n|$))+)
-		|^((?:\d+\.[ \t]+[^\n]*(?:\r?\n[ \t]+[^\n]*)*(?:\r?\n|$))+)
+		|^((?:\d+\.[ \t]+[^\n]*(?:(?:\r?\n[ \t]*)*\r?\n[ \t]+[^\n]*)*(?:\r?\n[ \t]*)*(?:\r?\n|$))+)
 	/mx
 
 	# Where one numbered item ends and the next begins.
@@ -57,7 +58,8 @@ module ReduckDocs
 	TAB_OPENER = /^::tab[ \t]+(.+?)[ \t]*$/
 	TILE_OPENER = /^::tile[ \t]+(.+?)[ \t]*$/
 	TILE_LINK = /\A\[([^\]]+)\]\(([^)]+)\)(?:[ \t]+icon:([a-z0-9_-]+))?\z/i
-	TILES_FROM = /^::tiles-from[ \t]+([a-z0-9-]+)[ \t]*$/
+	# The indent is kept so that a directive written under a step lands its group under that step.
+	TILES_FROM = /^([ \t]*)::tiles-from[ \t]+([a-z0-9-]+)[ \t]*$/
 
 	# The languages a grammar is loaded for; any other fence renders uncoloured, in the same frame.
 	HIGHLIGHTED = %w[bash typescript json toml].freeze
@@ -67,8 +69,9 @@ module ReduckDocs
 	APP_DOCS_LINK = %r{\]\(/docs(?:/([a-z0-9\-/]*))?(#[^)]*)?\)}
 
 	class Reader
-		def initialize(site)
+		def initialize(site, index_slug)
 			@site = site
+			@index_slug = index_slug
 			@markdown = site.find_converter_instance(Jekyll::Converters::Markdown)
 			@formatter = Rouge::Formatters::HTML.new
 		end
@@ -103,6 +106,14 @@ module ReduckDocs
 		# so a page that borrows its tiles in turn holds none of its own: one hop only.
 		def tiles_group(body)
 			segments(body).find { |segment| segment[:kind] == "tiles" }&.fetch(:body)
+		end
+
+		# The page as one markdown document, for a reader — or an agent — to take away whole. It is
+		# the source with its title put back on top and its links made absolute, so it reads the
+		# same pasted anywhere.
+		def markdown(doc, body)
+			base = "#{@site.config["url"]}#{@site.baseurl}"
+			"# #{doc.data["title"]}\n\n#{doc.data["description"]}\n\n#{rewrite_links(body.strip, base)}\n"
 		end
 
 		private
@@ -177,11 +188,13 @@ module ReduckDocs
 				end
 
 				if steps
+					# A step holds blocks the way a tab panel does: its first run of prose is the
+					# line beside the numeral, and whatever follows — a fence, a callout, a tiles
+					# group — is drawn under it, inside the step.
 					items = steps.split(STEP).drop(1).map do |item|
-						# The wrap of a line is indented to sit under its number, which is layout
-						# in the source and would read as a code block once the marker is gone.
-						html = render(slug, item.gsub(/^[ \t]+/, "").strip)
-						LONE_PARAGRAPH.match(html)&.captures&.first || html
+						inner = blocks(slug, dedent(item), allow_tabs: false)
+						lead = inner.first&.fetch("kind") == "html" ? inner.shift["html"] : ""
+						{ "html" => LONE_PARAGRAPH.match(lead)&.captures&.first || lead, "blocks" => inner }
 					end
 					out << { "kind" => "steps", "items" => items } unless items.empty?
 					next
@@ -197,6 +210,15 @@ module ReduckDocs
 			push_html(slug, markdown[cursor..], out)
 		end
 
+		# The lines under a step's number are indented to sit beneath it, which is layout in the
+		# source and would read as a code block once the number is gone. Only that shared indent
+		# goes, so the indentation inside a fence is kept.
+		def dedent(item)
+			lines = item.strip.split(/\r?\n/)
+			indent = lines.drop(1).reject { |line| line.strip.empty? }.map { |line| line[/\A[ \t]*/].length }.min || 0
+			[lines.first, *lines.drop(1).map { |line| line[indent..] || "" }].join("\n")
+		end
+
 		def push_html(slug, markdown, out)
 			return if markdown.nil? || markdown.strip.empty?
 
@@ -206,20 +228,26 @@ module ReduckDocs
 		def render(slug, markdown)
 			html = @markdown.convert(rewrite_links(markdown))
 			# An image is written beside the page that uses it, so its source is a bare file name.
-			# The page it renders on may be served from another path — `overview` answers at the
-			# root — so each is resolved against the page's own folder rather than the URL.
+			# The page it renders on may be served from another path — the index page answers at
+			# the root — so each is resolved against the page's own folder rather than the URL.
 			html.gsub(/(<img[^>]*\bsrc=")(?!https?:|data:|\/)([^"]+)(")/) do
 				"#{Regexp.last_match(1)}#{@site.baseurl}/#{slug}/#{Regexp.last_match(2)}#{Regexp.last_match(3)}"
 			end
 		end
 
-		def rewrite_links(markdown)
+		def rewrite_links(markdown, base = @site.baseurl)
 			markdown.gsub(APP_DOCS_LINK) do
 				slug = Regexp.last_match(1)
 				hash = Regexp.last_match(2)
-				path = slug.nil? || slug.empty? ? "/" : "/#{slug}/"
-				"](#{@site.baseurl}#{path}#{hash})"
+				"](#{base}#{path_of(slug)}#{hash})"
 			end
+		end
+
+		# The index page is served at the root, so a link written to it by slug has to land there
+		# too: `/quick-start/` is an address nothing answers at.
+		def path_of(slug)
+			slug = slug.to_s.chomp("/")
+			slug.empty? || slug == @index_slug ? "/" : "/#{slug}/"
 		end
 
 		def highlight(code, lang)
@@ -285,8 +313,7 @@ module ReduckDocs
 		def rewrite_href(href)
 			return href unless href.start_with?("/docs")
 
-			rest = href.delete_prefix("/docs").delete_prefix("/")
-			rest.empty? ? "#{@site.baseurl}/" : "#{@site.baseurl}/#{rest.chomp('/')}/"
+			"#{@site.baseurl}#{path_of(href.delete_prefix('/docs').delete_prefix('/'))}"
 		end
 	end
 
@@ -298,8 +325,8 @@ module ReduckDocs
 			collection = site.collections["docs"]
 			return if collection.nil?
 
-			reader = Reader.new(site)
-			index_slug = site.config["index_slug"] || "overview"
+			index_slug = site.config["index_slug"] || "quick-start"
+			reader = Reader.new(site, index_slug)
 
 			pages = collection.docs.map do |doc|
 				slug = File.basename(File.dirname(doc.relative_path))
@@ -314,18 +341,20 @@ module ReduckDocs
 
 			pages.each do |doc|
 				body = doc.content.gsub(TILES_FROM) do
-					group = owned[Regexp.last_match(1)]
+					indent, name = Regexp.last_match.captures
+					group = owned[name]
 					if group.nil?
-						Jekyll.logger.warn "Docs:", "::tiles-from names \"#{Regexp.last_match(1)}\", which holds no tiles group"
+						Jekyll.logger.warn "Docs:", "::tiles-from names \"#{name}\", which holds no tiles group"
 						""
 					else
-						":::tiles\n#{group}\n:::"
+						":::tiles\n#{group}\n:::".gsub(/^/, indent)
 					end
 				end
 
 				doc.data["blocks"] = reader.blocks(doc.data["slug"], body)
 				doc.data["search_text"] = plain_text(doc.data["blocks"])
 				doc.data["search_headings"] = headings(doc.data["blocks"])
+				site.pages << markdown_page(site, doc, reader.markdown(doc, body))
 
 				# Every layout reads `page.blocks`; leaving the markdown in place would only have
 				# kramdown convert it a second time, to output nothing renders.
@@ -390,6 +419,19 @@ module ReduckDocs
 			end
 		end
 
+		# The page's markdown, served beside its HTML as `index.md`: what the copy button on the
+		# page takes, and what an agent asks for when it wants the page and not the shell around
+		# it. Named `.txt` on the way in because a name ending in `.md` would be handed to kramdown
+		# and come out as HTML; the permalink is what gives it its address.
+		def markdown_page(site, doc, text)
+			page = Jekyll::PageWithoutAFile.new(site, site.source, "", "index.txt")
+			page.content = text
+			page.data["layout"] = nil
+			page.data["permalink"] = "#{doc.data["permalink"]}index.md"
+			page.data["sitemap"] = false
+			page
+		end
+
 		def search_index(site, pages)
 			entries = pages.reject { |doc| doc.data["draft"] || doc.data["search"] == false }.map do |doc|
 				{
@@ -420,7 +462,7 @@ module ReduckDocs
 		def strings(block)
 			case block["kind"]
 			when "html", "banner" then [block["html"]]
-			when "steps" then block["items"]
+			when "steps" then block["items"].flat_map { |item| [item["html"], *item["blocks"].flat_map { |inner| strings(inner) }] }
 			when "code" then [block["code"]]
 			when "tabs" then block["tabs"].flat_map { |tab| [tab["label"], *tab["blocks"].flat_map { |inner| strings(inner) }] }
 			when "tiles" then block["tiles"].flat_map { |tile| [tile["label"], tile["note"]] }

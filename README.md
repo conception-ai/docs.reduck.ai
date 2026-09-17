@@ -8,11 +8,12 @@ too, so a change to the wording is a push and nothing else.
 
 ```sh
 bundle install
-bundle exec jekyll serve
+bundle exec jekyll serve --livereload
 ```
 
-Then open <http://127.0.0.1:4000>. An edit shows on the next reload — `serve` watches the folder
-and rebuilds. Ruby 3.3 or later, and nothing else.
+Then open <http://127.0.0.1:4000>. `serve` watches the folder and rebuilds on an edit, and
+`--livereload` refreshes the open tab when it has. The one thing it does not pick up is a change
+to `_plugins/`: stop and start it for that. Ruby 3.3 or later, and nothing else.
 
 ```sh
 bundle exec jekyll build              # write _site/ once, without serving
@@ -46,8 +47,9 @@ The prose starts here.
 | `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
 | `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
 
-`_docs/overview/` is special: it is served at `/`, not at `/overview`, because it is where a
-reader lands. Give it the lowest `order` so it leads the nav.
+`_docs/quick-start/` is special: it is served at `/`, not at `/quick-start`, because it is where a
+reader lands. Give it the lowest `order` so it leads the nav. A link written to it by slug lands
+on `/` as well.
 
 The five sections are fixed in `_config.yml`. A page names one; it cannot invent one.
 
@@ -93,8 +95,11 @@ A tiles group can sit inside a tab. A tabs group inside a tab is not read as one
 page as the text it is. A group with nothing readable in it renders as plain text rather than as
 an empty bar or grid, so a typo shows rather than disappears.
 
-Every fenced code block gets a copy button. Nothing else does — a fence is the thing a reader
-copies, and a button on each paragraph would be noise.
+Two things carry a copy button: every fenced code block, and the page itself. The page's button
+copies its markdown — the source with the title on top and its links made absolute — which is
+also served beside the page as `index.md` (`/projects/index.md`), for an agent that wants the
+page without the shell around it. Nothing else gets one: a button on each paragraph would be
+noise.
 
 ### Showing another page's tiles
 
@@ -125,7 +130,19 @@ A blockquote is a callout. GitHub's alert syntax says which kind:
 `NOTE` and `IMPORTANT` read as a note, `TIP` as a success, `WARNING` as a warning, `CAUTION` as a
 danger. A blockquote that opens with none is a note.
 
-A run of numbered lines is drawn as joined steps rather than as an ordinary list.
+A run of numbered lines is drawn as joined steps rather than as an ordinary list. A step holds
+whatever is indented under its number — a fence, a callout, a tiles group, `::tiles-from` — and
+draws it inside the step, so the run stays one run:
+
+````markdown
+3. Install Reduck MCP:
+
+    ```bash
+    claude mcp add reduck --transport http --scope user https://mcp.reduck.ai
+    ```
+
+4. Start a new session.
+````
 
 `h2` and `h3` are what the search index reads as a page's structure, so use them to break a page up
 rather than jumping to `h4`.

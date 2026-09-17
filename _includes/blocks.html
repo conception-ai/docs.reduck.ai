@@ -18,8 +18,10 @@
 			<div class="banner-content">{{ block.html }}</div>
 		</div>
 	{%- when "steps" -%}
-		<ol class="steps">
-			{%- for item in block.items -%}<li>{{ item }}</li>{%- endfor -%}
+		<ol class="steps docs-prose">
+			{%- for item in block.items -%}
+				<li>{{ item.html }}{% include blocks.html blocks=item.blocks %}</li>
+			{%- endfor -%}
 		</ol>
 	{%- when "tabs" -%}
 		<div class="docs-tabs" data-tabs>

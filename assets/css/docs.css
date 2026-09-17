@@ -126,7 +126,7 @@
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	margin: 0 0 16px;
-	padding-inline: 12px;
+	padding-inline: 24px;
 	text-transform: uppercase;
 }
 
@@ -138,42 +138,69 @@
 	padding: 0;
 }
 
-/* A hub and its disclosure share a row, and the link takes what the button leaves. */
+/* Every label in the panel starts at the same x, and a row's left padding is the gutter that puts
+   it there. A hub's chevron hangs in that gutter, inside the row's own highlight, so the row is
+   one surface under the pointer and the chevron the one part of it that toggles rather than
+   follows. */
+.docs-sidebar .nav-link {
+	padding-left: 24px;
+}
+
 .docs-sidebar .row {
-	align-items: center;
-	display: flex;
-	gap: 2px;
+	position: relative;
 }
 
 .docs-sidebar .disclosure {
-	border-radius: 6px;
-	color: var(--color-grey-500);
+	align-items: center;
+	border-radius: 4px;
+	color: var(--color-grey-300);
 	display: flex;
-	flex-shrink: 0;
-	padding: 6px;
+	height: 24px;
+	justify-content: center;
+	left: 0;
+	position: absolute;
+	top: 50%;
+	transition:
+		background 150ms,
+		color 150ms;
+	translate: 0 -50%;
+	width: 24px;
+}
+
+.docs-sidebar .row:hover .disclosure {
+	color: var(--color-grey-50);
 }
 
 .docs-sidebar .disclosure:hover {
-	background: var(--color-grey-800);
+	background: var(--color-grey-500);
+	color: var(--color-grey-0);
+}
+
+/* The link is the whole row, so it takes the hover the moment the pointer is over the chevron
+   too; the chevron's own tint above it is what says the two do different things. */
+.docs-sidebar .row:has(.disclosure:hover) .nav-link {
+	background: var(--color-grey-700);
+}
+
+.docs-sidebar .row.toggled .nav-link {
+	background: var(--color-grey-600);
 	color: var(--color-grey-50);
 }
 
 .docs-sidebar .disclosure .icon {
-	height: 14px;
+	height: 20px;
+	stroke-width: 2.5;
 	transition: rotate 150ms;
-	width: 14px;
+	width: 20px;
 }
 
 .docs-sidebar .disclosure[aria-expanded="true"] .icon {
 	rotate: 90deg;
 }
 
-/* Indented to the width of the disclosure plus the row's own padding, so a child sits under the
-   first letter of its hub rather than under the chevron. */
+/* A child steps in by one gutter, so its label starts one indent under its hub's. */
 .docs-sidebar .children {
-	border-left: 1px solid var(--color-grey-700);
-	margin-left: 14px;
-	padding-left: 6px;
+	padding-left: 12px;
 }
 
 .docs-sidebar .children[hidden] {
@@ -216,20 +243,27 @@
 	padding: 48px 40px 96px;
 }
 
-.docs-article > .section {
-	color: var(--color-orange-500);
-	font-size: var(--font-size-body);
-	font-weight: 500;
-	margin: 0 0 8px;
+/* The title and, on its far side, the button that takes the page away as markdown. */
+.docs-article > header {
+	align-items: flex-start;
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+	margin: 0 0 32px;
 }
 
-.docs-article > h1 {
+.docs-article > header h1 {
 	color: var(--color-grey-0);
 	font-size: var(--font-size-title-medium);
 	font-weight: 600;
 	letter-spacing: -0.02em;
 	line-height: 1.15;
-	margin: 0 0 32px;
+	margin: 0;
+}
+
+.docs-article > header .btn {
+	flex-shrink: 0;
+	margin-top: 4px;
 }
 
 /* The prose arrives as the HTML a page's markdown was rendered to, so every element is styled by
@@ -664,9 +698,25 @@ ul.docs-tiles > li {
 	margin: 0;
 }
 
+/* Steps are prose with a rail: the list wears `docs-prose` for its type, and gives back the
+   bullets, the indent and the gap between items that the prose rules put on any list. */
 ol.steps {
 	list-style: none;
 	padding: 0;
+}
+
+ol.steps > li {
+	margin: 0;
+}
+
+/* A block under a step's lead line: set off from the line above it, and flush with the step's
+   own bottom edge so the rail's spacing is the list's and not the block's. */
+.steps > li > :is(.code-block, .banner, .docs-tiles, .docs-prose) {
+	margin-top: 12px;
+}
+
+.steps > li > :is(.code-block, .banner, .docs-tiles, .docs-prose):last-child {
+	margin-bottom: 0;
 }
 
 .docs-prose .code-block {
@@ -681,7 +731,6 @@ ol.steps {
 	padding: 0;
 }
 
-.docs-prose .banner,
-.docs-prose .steps {
+.docs-prose .banner {
 	font-size: var(--font-size-body);
 }
