@@ -52,4 +52,4 @@ Reduck MCP possesses a unique blend of features that make it a first class tool 
 
 - **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain
 - **[Stealthy and private extension](/docs/core-concepts#browser)**: Reduck leverages your browser logged in state, fingerprints and residential IP so detection risk is minimal and credentials never leave your machine
-- **[Parallel runs](/docs/core-concepts#runs)**: scripts can be run in parallel with a single tool call for fast iterations
+- **[Parallel runs](/docs/core-concepts#parallel-runs)**: scripts can be run in parallel with a single tool call for fast iterations
