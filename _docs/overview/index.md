@@ -53,3 +53,19 @@ Reduck MCP possesses a unique blend of features that make it a first class tool 
 - **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain
 - **[Stealthy and private extension](/docs/core-concepts#browser)**: Reduck leverages your browser logged in state, fingerprints and residential IP so detection risk is minimal and credentials never leave your machine
 - **[Parallel runs](/docs/core-concepts#parallel-runs)**: scripts can be run in parallel with a single tool call for fast iterations
+
+# **Build your own integrations**
+
+!how-it-works.gif
+
+If our Official Script Library does not contain the exact scripts you want (e.g. you need to automate a local government portal or a custom made ERP), then you can use Reduck MCP to build your own scripts for your agent to use:
+
+Provide a prompt to tell your Agent to build a new script, such as:
+
+- Provide a prompt to tell your Agent to build a new script, such as:
+
+```markdown
+"Use Reduck MCP to create scripts for trends.google.com keywords"
+```
+
+- Once done your scripts can be discovered by your agent with Reduck MCP and can be found at https://reduck.ai/projects/

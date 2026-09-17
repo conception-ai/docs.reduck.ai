@@ -32,8 +32,6 @@ sections:
       label: Connect your agent
     - id: integrations
       label: Integrations
-    - id: security
-      label: Security
 
 # A page that holds a whole section beneath it in the panel rather than beside it: the hub and the
 # pages it leads to read as one entry the reader opens. Where the hub is missing the section still
