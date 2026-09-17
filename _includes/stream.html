@@ -1,0 +1,32 @@
+{%- comment -%}
+  A Cloudflare Stream video, by its id. The player is Stream's own, in an iframe that keeps the
+  16:9 box while the column resizes. With a title it also declares itself to a crawler as a
+  VideoObject; description, uploadDate (YYYY-MM-DD) and duration (ISO 8601, PT1M30S) join that
+  declaration when given, and are left out when not.
+
+  Usage: {% include stream.html id="<uid>" title="…" description="…" uploadDate="…" duration="…" %}
+{%- endcomment -%}
+{%- assign stream = "https://" | append: site.cloudflare_stream_domain | append: "/" | append: include.id -%}
+<div class="stream">
+	<iframe allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy" src="{{ stream }}/watch" title="{{ include.title | default: 'Video' | escape }}"></iframe>
+</div>
+{%- if include.title and include.title != "" %}
+<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "VideoObject",
+		"name": {{ include.title | jsonify }},
+		{%- if include.description %}
+		"description": {{ include.description | jsonify }},
+		{%- endif %}
+		{%- if include.uploadDate %}
+		"uploadDate": {{ include.uploadDate | jsonify }},
+		{%- endif %}
+		{%- if include.duration %}
+		"duration": {{ include.duration | jsonify }},
+		{%- endif %}
+		"thumbnailUrl": "{{ stream }}/thumbnails/thumbnail.jpg",
+		"embedUrl": "{{ stream }}/watch"
+	}
+</script>
+{%- endif %}

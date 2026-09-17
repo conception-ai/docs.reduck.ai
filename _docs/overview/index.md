@@ -1,58 +1,55 @@
 ---
 title: Overview
-description: Reduck turns any website into a tool your agent can call — a reusable browser script that returns structured data.
+description: Create an account, pair your browser, connect your agent to Reduck MCP, and run your first automation.
 section: get-started
 order: 10
 ---
 
-Most of what a team needs is on a website, not behind an API. Reduck closes that gap: it turns a
-flow on a site — a search, an export, a form, a download — into a **script** your agent can call
-and get JSON back from.
+Agents struggle to automate websites with no API, such as LinkedIn, Reddit or your custom ERP. While they are able to do [Computer Use](https://claude.com/blog/dispatch-and-computer-use), aka manipulating a browser to click or type, it is inadequate for complex and heavy workloads as it is:
 
-An agent connects to Reduck once. From then on it can find a script, run it, and read the result,
-without you writing selectors or maintaining a scraper.
+- **Unreliable**: results vary and get worse with context size explosion
+- **Slow**: each step requires slow thinking to decide next browser action
+- **Expensive**: context fills up quickly and complex tasks hit rate limits
 
-## What a script is
+That's why we built Reduck MCP: **the easiest way for an agent to integrate and automate any site you use**.
 
-A script is deterministic code that automates one flow on one site. It declares what it takes and
-what it returns, so calling it is like calling a function:
+Reduck MCP allows agents to discover, run and create browser automation scripts that serve as tools. Scripts run in your own Chrome, through our extension, which allows your agent to work where you are logged in — no credentials exposure, and same fingerprints so no bot detection.
 
-```json
-{
-	"script": {
-		"handle": "reduck",
-		"host": "airbnb.com",
-		"slug": "search",
-		"args": { "city": "Lisbon", "guests": 2, "maxPrice": 150 }
-	}
-}
-```
+By exposing deterministic scripts as tools with a clear contract of inputs and outputs, Agents can perform complex automations quickly, accurately and cheaply, as they no longer need to manipulate a browser directly.
 
-A script is addressed by the site it automates and the flow it covers —
-`[<handle>/]<host>/<slug>`. A bare address is your own script; `reduck/` is the
-[official library](/docs/official-library); `@someone/` is that person's.
+## Quick start
 
-Reduck maintains an [official library](/docs/official-library) of scripts for common sites, and
-your agent can [write new ones](/docs/scripts) for sites the library does not cover yet.
+1. Create an account at [reduck.ai](https://reduck.ai/#signin).
+2. Install the [Reduck extension](https://chromewebstore.google.com/detail/reduck/koccidjchcojlmgkdhibpgjbnhcoopio) and pair it with your account.
 
-## Where a script runs
+    :::details More about pairing
+    Right after the install, the extension asks to pair with your Reduck account: click
+    **Authorise**. A paired browser is a [device](/docs/core-concepts#browser), and scripts run in it act as
+    you — they inherit the sites you are already signed into, and no password ever reaches
+    Reduck.
 
-Every run happens in a real browser — which is why Reduck works on sites with no API and on pages
-behind a login. You choose whose browser:
+    If you missed the prompt, start pairing again from the extension itself:
 
-- **Your own Chrome**, through the Reduck extension. The script inherits the sites you are already
-  signed into, and your credentials never leave the machine.
-- **A managed browser** that Reduck hosts, for automation that has to run when your laptop is
-  closed.
+    ::video de9cf994bb67e90bdecc4e37a450bbb3 Restart pairing from the Reduck extension
 
-[Browsers](/docs/browsers) covers the trade-off between them.
+    The extension is only needed to run scripts on your own Chrome. To use
+    [managed browsers](/docs/core-concepts#browser) only, skip this step.
+    :::
 
-## Three ways in
+3. Install Reduck MCP. Follow the right install step depending on your client:
 
-| You want                                            | Use                                                          |
-| --------------------------------------------------- | ------------------------------------------------------------ |
-| An agent that finds and runs scripts for you        | [The MCP server](/docs/mcp-tools)                            |
-| Scripts in a terminal, or piped into something else | [The CLI](/docs/cli)                                         |
-| Calls from your own code                            | [The REST API](/docs/api-reference) and [its SDK](/docs/sdk) |
+    ::tiles-from connect-your-agent
 
-[Quick start](/docs/quick-start) sets up whichever of the three you want, in a few minutes.
+4. Start a new session and get started with your first automation! You can try a prompt like:
+
+    ```markdown
+    Using Reduck MCP, search on Google the top 3 latest posts of the week on "AI Agents" on LinkedIn. Then return the profiles of potential buyers of B2B AI agents
+    ```
+
+## Key Features
+
+Reduck MCP possesses a unique blend of features that make it a first class tool for your Agent to automate complex web tasks:
+
+- **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain
+- **[Stealthy and private extension](/docs/core-concepts#browser)**: Reduck leverages your browser logged in state, fingerprints and residential IP so detection risk is minimal and credentials never leave your machine
+- **[Parallel runs](/docs/core-concepts#parallel-runs)**: scripts can be run in parallel with a single tool call for fast iterations

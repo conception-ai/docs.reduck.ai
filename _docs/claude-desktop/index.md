@@ -11,7 +11,7 @@ both. The connector follows your Claude account, not the machine.
 ## Before you start
 
 You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
-Both are in the [quick start](/docs/quick-start).
+Both are in the [quick start](/docs/overview#quick-start).
 
 ## Add the connector
 

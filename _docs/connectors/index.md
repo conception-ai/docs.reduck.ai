@@ -5,7 +5,7 @@ section: security
 order: 320
 ---
 
-A [managed browser](/docs/browsers) starts with no session of yours. A **connector** is how you
+A [managed browser](/docs/core-concepts#browser) starts with no session of yours. A **connector** is how you
 give it one: the cookies you hold for a single site, uploaded from your own Chrome, so a script
 that needs a login acts as you there.
 
