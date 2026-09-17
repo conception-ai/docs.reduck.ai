@@ -2,7 +2,7 @@
 title: Core concepts
 description: Scripts, the official library, projects, and the two browsers a script can run on.
 section: get-started
-order: 20
+order: 27
 ---
 
 ## Scripts
