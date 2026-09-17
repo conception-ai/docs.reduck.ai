@@ -84,7 +84,7 @@ differs is who is calling.
 
 | You want                                             | Use                                 |
 | ---------------------------------------------------- | ----------------------------------- |
-| An agent that finds and runs scripts for you         | [MCP](/docs/mcp)                    |
+| An agent that finds and runs scripts for you         | [MCP](/docs/connect-your-agent)     |
 | Scripts in a terminal, in parallel, or piped onward  | [The CLI](/docs/cli)                |
 | Calls from your own code, a cron, or an orchestrator | [The REST API](/docs/api-reference) |
 

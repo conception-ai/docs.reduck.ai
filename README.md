@@ -56,9 +56,9 @@ The four sections are fixed in `_config.yml`. A page names one; it cannot invent
 
 ### A page something else publishes
 
-Two pages are documents with an owner elsewhere: the MCP's overview, which the server serves at
-`mcp.reduck.ai/skill`, and the CLI's README as npm shows it. Each is a folder with front matter
-only, and `source` names the file in `assets/` its body is read from:
+A page can be a document with an owner elsewhere — the CLI page is the README npm shows. Such a
+page is a folder with front matter only, and `source` names the file in `assets/` its body is read
+from:
 
 ```markdown
 ---
@@ -70,7 +70,7 @@ source: assets/cli-readme.md
 ---
 ```
 
-`.github/workflows/pages.yml` refreshes those files on every deploy, as it does `openapi.json`, so
+`.github/workflows/pages.yml` refreshes that file on every deploy, as it does `openapi.json`, so
 the site never holds a copy that can drift. The document's own `#` title, and anything above it,
 is dropped: the front matter is the title. A `source` that names no file fails the build.
 

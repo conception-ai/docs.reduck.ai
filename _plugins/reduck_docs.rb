@@ -405,8 +405,8 @@ module ReduckDocs
 		# page renders. A miss fails the build — on the laptop, in the PR check and in the deploy
 		# alike — and names the page it sits on, so the fix is one edit away. External links are
 		# not looked at: they are outside this repository's control.
-		# A page whose body is a document something else publishes — the MCP's own overview, the
-		# CLI's README on npm — fetched into `assets/` by the deploy workflow so the site never
+		# A page whose body is a document something else publishes — the CLI's README on npm —
+		# fetched into `assets/` by the deploy workflow so the site never
 		# holds a copy that can drift. The document's own title, and whatever sits above it (a
 		# logo, badges), is dropped: the front matter is the title here. A missing file fails the
 		# build, because the page would otherwise publish empty and nothing would say so.
