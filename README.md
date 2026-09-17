@@ -167,7 +167,10 @@ description, an upload date, a duration.
 rather than jumping to `h4`.
 
 A link written as `/docs/<slug>` — the shape the app used when it served these pages under a path
-— is rewritten to `/<slug>/`, so prose can move between the two without editing.
+— is rewritten to `/<slug>/`, so prose can move between the two without editing. Write every
+internal link that way: each one is checked when the site builds, and a link to a page that does
+not exist, or to a `#heading` the page does not render, fails the build and names the page it
+sits on. External links are not checked.
 
 ## The API reference
 

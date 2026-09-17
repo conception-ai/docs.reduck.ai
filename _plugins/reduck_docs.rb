@@ -73,11 +73,16 @@ module ReduckDocs
 	APP_DOCS_LINK = %r{\]\(/docs(?:/([a-z0-9\-/]*))?(#[^)]*)?\)}
 
 	class Reader
+		# Every `/docs/…` link met while reading, with the page it sits on, for the generator to
+		# check once every page — and so every heading — is known.
+		attr_reader :links
+
 		def initialize(site, index_slug)
 			@site = site
 			@index_slug = index_slug
 			@markdown = site.find_converter_instance(Jekyll::Converters::Markdown)
 			@formatter = Rouge::Formatters::HTML.new
+			@links = []
 		end
 
 		# The page, as the list of blocks a layout walks.
@@ -98,7 +103,7 @@ module ReduckDocs
 					tabs.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tabs", "id" => "tabs-#{group}", "tabs" => tabs }
 					group += 1
 				when "tiles"
-					tiles = tiles_of(segment[:body])
+					tiles = tiles_of(slug, segment[:body])
 					tiles.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tiles", "tiles" => tiles }
 				when "details"
 					# Tiles and fences, but no tabs: folded prose is already one step aside from
@@ -243,7 +248,7 @@ module ReduckDocs
 		end
 
 		def render(slug, markdown)
-			html = @markdown.convert(rewrite_links(markdown))
+			html = @markdown.convert(rewrite_links(markdown, from: slug))
 			# An image is written beside the page that uses it, so its source is a bare file name.
 			# The page it renders on may be served from another path — the index page answers at
 			# the root — so each is resolved against the page's own folder rather than the URL.
@@ -252,12 +257,19 @@ module ReduckDocs
 			end
 		end
 
-		def rewrite_links(markdown, base = @site.baseurl)
+		# `from` is the page the markdown belongs to; given, each link is recorded for the check.
+		# The markdown copy of a page passes none: its links are the page's, already recorded.
+		def rewrite_links(markdown, base = @site.baseurl, from: nil)
 			markdown.gsub(APP_DOCS_LINK) do
 				slug = Regexp.last_match(1)
 				hash = Regexp.last_match(2)
+				record(from, slug, hash) if from
 				"](#{base}#{path_of(slug)}#{hash})"
 			end
+		end
+
+		def record(from, slug, hash)
+			@links << { from: from, slug: slug.to_s.chomp("/"), hash: hash.to_s.delete_prefix("#") }
 		end
 
 		# The index page is served at the root, so a link written to it by slug has to land there
@@ -303,7 +315,7 @@ module ReduckDocs
 			tabs
 		end
 
-		def tiles_of(body)
+		def tiles_of(slug, body)
 			parts = body.split(TILE_OPENER)
 			tiles = []
 			(1...parts.length).step(2) do |i|
@@ -318,7 +330,7 @@ module ReduckDocs
 
 				tile = {
 					"label" => label,
-					"href" => rewrite_href(href),
+					"href" => rewrite_href(slug, href),
 					"note" => parts[i + 1].to_s.strip.gsub(/\s+/, " ")
 				}
 				tile["icon"] = icon if icon
@@ -327,10 +339,12 @@ module ReduckDocs
 			tiles
 		end
 
-		def rewrite_href(href)
+		def rewrite_href(from, href)
 			return href unless href.start_with?("/docs")
 
-			"#{@site.baseurl}#{path_of(href.delete_prefix('/docs').delete_prefix('/'))}"
+			target, hash = href.delete_prefix("/docs").delete_prefix("/").split("#", 2)
+			record(from, target, hash)
+			"#{@site.baseurl}#{path_of(target)}#{hash ? "##{hash}" : ""}"
 		end
 	end
 
@@ -378,12 +392,35 @@ module ReduckDocs
 				doc.content = ""
 			end
 
+			check_links(reader.links, pages, index_slug)
 			site.data["nav"] = nav(site, pages)
 			link_next(site.data["nav"], pages)
 			site.pages << search_index(site, pages)
 		end
 
 		private
+
+		# Every `/docs/<slug>#anchor` link names a page that exists and, with an anchor, an id that
+		# page renders. A miss fails the build — on the laptop, in the PR check and in the deploy
+		# alike — and names the page it sits on, so the fix is one edit away. External links are
+		# not looked at: they are outside this repository's control.
+		def check_links(links, pages, index_slug)
+			ids = pages.to_h do |doc|
+				[doc.data["slug"], doc.data["blocks"].flat_map { |block| strings(block) }.join.scan(/\bid="([^"]+)"/).flatten]
+			end
+
+			dead = links.uniq.filter_map do |link|
+				slug = link[:slug].empty? ? index_slug : link[:slug]
+				if !ids.key?(slug)
+					"#{link[:from]}: /docs/#{link[:slug]} — no such page"
+				elsif !link[:hash].empty? && !ids[slug].include?(link[:hash])
+					"#{link[:from]}: /docs/#{link[:slug]}##{link[:hash]} — #{slug} has no heading with that id"
+				end
+			end
+			return if dead.empty?
+
+			raise Jekyll::Errors::FatalException, "Dead links:\n  #{dead.join("\n  ")}"
+		end
 
 		# The nav panel: the published pages grouped under their section, each section in the order
 		# the config fixes and each page in the order its front matter asked for. A section no page
