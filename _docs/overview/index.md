@@ -26,16 +26,11 @@ By exposing deterministic scripts as tools with a clear contract of inputs and o
 
     :::details More about pairing
     Right after the install, the extension asks to pair with your Reduck account: click
-    **Authorise**. A paired browser is a [device](/docs/core-concepts#browser), and scripts run in it act as
-    you — they inherit the sites you are already signed into, and no password ever reaches
-    Reduck.
+    **Authorise**.
 
     If you missed the prompt, start pairing again from the extension itself:
 
     ::video de9cf994bb67e90bdecc4e37a450bbb3 Restart pairing from the Reduck extension
-
-    The extension is only needed to run scripts on your own Chrome. To use
-    [managed browsers](/docs/core-concepts#browser) only, skip this step.
     :::
 
 3. Install Reduck MCP. Follow the right install step depending on your client:
@@ -88,11 +83,10 @@ If our Official Script Library does not contain the exact scripts you want (e.g.
 
 ## Integrations
 
-Every script can be reached three ways. They run the same scripts on the same browsers; what
-differs is who is calling.
+Our browser automation infrastructure is mainly called from AI Agents through MCP but we also support CLI and REST API for alternative deployment options, e.g. inside an orchestrator such as n8n or a cron.
 
-| You want                                             | Use                             |
-| ---------------------------------------------------- | ------------------------------- |
-| An agent that finds and runs scripts for you         | [MCP](/docs/connect-your-agent) |
-| Scripts in a terminal, in parallel, or piped onward  | [CLI](/docs/cli)                |
-| Calls from your own code, a cron, or an orchestrator | [REST API](/docs/api-reference) |
+| Integration                     | Best for                                                                                                                                            |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [MCP](/docs/connect-your-agent) | Agentic usage. Works on most clients, including mobile ones like Claude. Fast setup, nothing to install.                                            |
+| [CLI](/docs/cli)                | Agentic usage from a terminal. Pipes outputs into complex workflows: store results locally, chain with other tools, run twenty scripts in parallel. |
+| [REST API](/docs/api-reference) | Deployments without an agent: your own code, a cron, an orchestrator such as n8n. The door built for managed browsers, so it runs 24/7 without you. |
