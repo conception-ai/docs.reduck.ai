@@ -1,6 +1,6 @@
 ---
 title: REST API
-description: Every REST endpoint of the Reduck API — run scripts, browse and author them, list your devices, and read run results from your own code.
+description: The Reduck REST API — run a script, read a run or a batch, and list scripts from your own code.
 section: integrations
 order: 230
 layout: api-reference

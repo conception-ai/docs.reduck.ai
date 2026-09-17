@@ -195,10 +195,11 @@ sits on. External links are not checked.
 
 ## The API reference
 
-`/api-reference` is Scalar over the app's OpenAPI document. The app serves that document without
-CORS headers, so a browser here cannot read it: `.github/workflows/pages.yml` fetches it on every
-build and the copy in `assets/openapi.json` is what the page opens. The build also runs daily, so
-an endpoint added to the app shows up here without a push.
+`/api-reference` is Scalar over the MCP server's OpenAPI document — the REST door a caller uses,
+and the same document `mcp.reduck.ai/docs` shows. The server serves it without CORS headers, so a
+browser here cannot read it: `.github/workflows/pages.yml` fetches it on every build and the copy
+in `assets/openapi.json` is what the page opens. The build also runs daily, so an endpoint added
+to the server shows up here without a push.
 
 ## Publishing
 

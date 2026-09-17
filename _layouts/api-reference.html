@@ -3,9 +3,10 @@ layout: docs-shell
 ---
 
 {%- comment -%}
-  Scalar draws the operation list and the endpoints from the OpenAPI document. The app serves that
-  document without CORS headers, so a browser here cannot read it: `.github/workflows/pages.yml`
-  fetches it at build time and the copy in `assets/` is what this page opens.
+  Scalar draws the operation list and the endpoints from the MCP server's OpenAPI document — the
+  one mcp.reduck.ai/docs shows. The server serves it without CORS headers, so a browser here
+  cannot read it: `.github/workflows/pages.yml` fetches it at build time and the copy in `assets/`
+  is what this page opens.
 {%- endcomment -%}
 <div class="reference" id="api-reference-root"></div>
 
