@@ -8,12 +8,12 @@
 
 <nav class="docs-sidebar" id="docs-nav" aria-label="Documentation">
 	{%- comment -%}
-	  The way back to the app, for the widths where the bar has no room for it. It leads the panel:
+	  The way into the app, for the widths where the bar has no room for it. It leads the panel:
 	  the reader opened the panel to go somewhere, and leaving the docs is one of the places.
 	{%- endcomment -%}
-	<a class="btn large btn-secondary back" href="{{ site.app_url }}">
-		{% include icon.html name="arrow-left" %}
-		Back to Reduck
+	<a class="btn large btn-primary open-app" href="{{ site.app_url }}/projects">
+		{% include icon.html name="objects-column" %}
+		Open app
 	</a>
 
 	{%- for section in site.data.nav -%}
