@@ -17,7 +17,7 @@ every install shares. You can see your devices at
 
 | Kind        | What it is                                                                              |
 | ----------- | --------------------------------------------------------------------------------------- |
-| `extension` | A Chrome window paired through the [Reduck extension](/docs/extension). The one to use. |
+| `extension` | A Chrome window paired through the [Reduck extension](https://chromewebstore.google.com/detail/reduck/koccidjchcojlmgkdhibpgjbnhcoopio). The one to use. |
 | `local`     | A browser paired from a terminal with the CLI.                                          |
 
 The kind only says how Reduck reaches the browser. A script does not know the difference.

@@ -11,7 +11,9 @@ require "rouge"
 #
 #   * `:::tabs` / `::tab` — alternatives a reader picks between
 #   * `:::tiles` / `::tile` — a grid of links, each card clickable as a whole
+#   * `:::details <summary>` — prose folded under one line, for the reader who wants more
 #   * `::tiles-from <slug>` — the tiles another page owns, copied in before the page is read
+#   * `::video <uid> <title>` — a Cloudflare Stream video, by its id
 #
 # A page also comes apart into blocks rather than into one string of HTML: a fence, a callout and
 # a run of numbered steps each carry a frame of their own, which they cannot wear while they are
@@ -25,6 +27,7 @@ module ReduckDocs
 		^```([^\n]*)\r?\n(.*?)^```[ \t]*$
 		|^((?:>[^\n]*(?:\r?\n|$))+)
 		|^((?:\d+\.[ \t]+[^\n]*(?:(?:\r?\n[ \t]*)*\r?\n[ \t]+[^\n]*)*(?:\r?\n[ \t]*)*(?:\r?\n|$))+)
+		|^::video[ \t]+([a-f0-9]{32})(?:[ \t]+([^\n]*?))?[ \t]*$
 	/mx
 
 	# Where one numbered item ends and the next begins.
@@ -53,7 +56,8 @@ module ReduckDocs
 		"danger" => "circle-xmark"
 	}.freeze
 
-	GROUP_OPEN = /^:::(tabs|tiles)[ \t]*$/
+	# Only `details` takes a label — the line the group folds under.
+	GROUP_OPEN = /^:::(tabs|tiles|details)(?:[ \t]+(.+?))?[ \t]*$/
 	GROUP_CLOSE = /^:::[ \t]*$/
 	TAB_OPENER = /^::tab[ \t]+(.+?)[ \t]*$/
 	TILE_OPENER = /^::tile[ \t]+(.+?)[ \t]*$/
@@ -96,6 +100,14 @@ module ReduckDocs
 				when "tiles"
 					tiles = tiles_of(segment[:body])
 					tiles.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tiles", "tiles" => tiles }
+				when "details"
+					# Tiles and fences, but no tabs: folded prose is already one step aside from
+					# the page, and a choice inside it would be a second.
+					out << {
+						"kind" => "details",
+						"summary" => segment[:label].to_s.strip,
+						"blocks" => blocks(slug, segment[:body], allow_tabs: false)
+					}
 				end
 			end
 
@@ -137,7 +149,7 @@ module ReduckDocs
 				if group.nil?
 					if opener
 						flush.call
-						group = { kind: opener[1], lines: [], depth: 1 }
+						group = { kind: opener[1], label: opener[2], lines: [], depth: 1 }
 					else
 						text << line
 					end
@@ -149,7 +161,7 @@ module ReduckDocs
 				end
 
 				if group[:depth].zero?
-					out << { kind: group[:kind], body: group[:lines].join("\n") }
+					out << { kind: group[:kind], label: group[:label], body: group[:lines].join("\n") }
 					group = nil
 				else
 					group[:lines] << line
@@ -157,7 +169,7 @@ module ReduckDocs
 			end
 
 			# A group left open at the end of the page never said where it stops, so it is prose.
-			text.push(":::#{group[:kind]}", *group[:lines]) if group
+			text.push(":::#{group[:kind]} #{group[:label]}".strip, *group[:lines]) if group
 			flush.call
 			out
 		end
@@ -172,7 +184,12 @@ module ReduckDocs
 				push_html(slug, markdown[cursor...match.begin(0)], out)
 				cursor = match.end(0)
 
-				info, fenced, quote, steps = match.captures
+				info, fenced, quote, steps, video, title = match.captures
+
+				if video
+					out << { "kind" => "video", "id" => video, "title" => title.to_s.strip }
+					next
+				end
 
 				if quote
 					quoted = quote.gsub(/^>[ \t]?/, "").strip
@@ -466,6 +483,8 @@ module ReduckDocs
 			when "code" then [block["code"]]
 			when "tabs" then block["tabs"].flat_map { |tab| [tab["label"], *tab["blocks"].flat_map { |inner| strings(inner) }] }
 			when "tiles" then block["tiles"].flat_map { |tile| [tile["label"], tile["note"]] }
+			when "details" then [block["summary"], *block["blocks"].flat_map { |inner| strings(inner) }]
+			when "video" then [block["title"]]
 			else []
 			end
 		end

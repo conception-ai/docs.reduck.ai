@@ -91,6 +91,14 @@ Custom connector
 :::
 ```
 
+**Details** — prose folded under one line, for the reader who wants more than the step says:
+
+```markdown
+:::details More about pairing
+Prose, fences, tiles, a video.
+:::
+```
+
 A tiles group can sit inside a tab. A tabs group inside a tab is not read as one, and stays on the
 page as the text it is. A group with nothing readable in it renders as plain text rather than as
 an empty bar or grid, so a typo shows rather than disappears.
@@ -143,6 +151,17 @@ draws it inside the step, so the run stays one run:
 
 4. Start a new session.
 ````
+
+A video is one line naming its Cloudflare Stream id, then its title:
+
+```markdown
+::video de9cf994bb67e90bdecc4e37a450bbb3 Restart pairing from the Reduck extension
+```
+
+It renders Stream's player in a 16:9 box, and the title declares it to crawlers as a video. The
+upload itself is the `cloudflare-stream-video` skill in the code repository, and
+`_includes/stream.html` is what a layout calls when it needs more than the line gives — a
+description, an upload date, a duration.
 
 `h2` and `h3` are what the search index reads as a page's structure, so use them to break a page up
 rather than jumping to `h4`.

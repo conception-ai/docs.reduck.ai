@@ -7,6 +7,9 @@ app_url: https://reduck.ai
 discord_url: https://discord.gg/reduck
 lang: en
 
+# Where a `::video` line's player is served from — Conception AI's Cloudflare Stream account.
+cloudflare_stream_domain: customer-469wlygs2m99dfwt.cloudflarestream.com
+
 collections:
     docs:
         output: true

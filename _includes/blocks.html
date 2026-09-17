@@ -57,6 +57,13 @@
 				</li>
 			{%- endfor -%}
 		</ul>
+	{%- when "details" -%}
+		<details class="docs-details">
+			<summary>{% include icon.html name="chevron-right" %}{{ block.summary }}</summary>
+			<div class="body">{% include blocks.html blocks=block.blocks %}</div>
+		</details>
+	{%- when "video" -%}
+		{% include stream.html id=block.id title=block.title %}
 	{%- else -%}
 		<div class="docs-prose">{{ block.html }}</div>
 	{%- endcase -%}
