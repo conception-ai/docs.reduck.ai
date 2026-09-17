@@ -19,6 +19,11 @@
 .docs-body > main {
 	flex: 1;
 	min-width: 0;
+
+	/* The page scrolls down, never sideways. Naming both axes is what holds that: CSS computes the
+	   axis left out to `auto` when the other one is not `visible`, so a vertical scroller on its own
+	   would pan the whole article as soon as anything inside it ran wide. */
+	overflow-x: hidden;
 	overflow-y: auto;
 }
 
@@ -482,6 +487,15 @@
 	font-family: var(--font-mono);
 	font-size: var(--font-size-body);
 	padding: 2px 6px;
+}
+
+/* A token with no space in it — a tool name, a path — can be wider than the column on a narrow
+   screen, and an inline `code` has nowhere to break it. Every block that can run wide scrolls
+   inside its own box; this one wraps. The scope is the article and not the prose, because a step
+   or a tile holds inline code of its own. `pre` is left out: a code block keeps its lines whole
+   and scrolls. */
+.docs-article code:not(pre code) {
+	overflow-wrap: anywhere;
 }
 
 /* The way on, at the end of the page and on the side the eye leaves a line from. The label
