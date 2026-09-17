@@ -20,7 +20,7 @@ curl https://mcp.reduck.ai/run \
   --data '{"script":"@reduck/airbnb.com/search","args":{"city":"Lisbon"}}'
 ```
 
-The same key works for the [SDK](/docs/sdk) and for the [CLI](/docs/cli), where setting
+The same key works for the [CLI](/docs/cli), where setting
 `REDUCK_API_KEY` replaces `login`. A key acts as you, with everything your account can do, so treat
 it as a password: keep it out of version control, and delete it from the dashboard the moment it
 leaks. Deleting is what revokes it — there is no expiry to wait for.
@@ -62,7 +62,7 @@ That is the MCP specification's rule about token privilege, and it is why the to
 gives the MCP server is never passed on to the API: the MCP calls the API with a credential of its
 own instead. A stolen token is good for one door and nothing behind it.
 
-If you are minting a token yourself for the [SDK](/docs/sdk), ask for
+If you are minting a token yourself for the [REST API](/docs/api-reference), ask for
 `resource=https://reduck.ai`. A token obtained for the MCP will not work there, and the error will
 tell you so.
 

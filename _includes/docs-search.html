@@ -2,11 +2,15 @@
   The palette ⌘K opens. Its corpus is `/search.json`, fetched on the first open rather than with
   the page: a reader who never searches should not pay for it, and one who does pays once.
 {%- endcomment -%}
-<dialog class="docs-search" aria-label="Search the docs" data-search-dialog>
+<dialog class="docs-search" aria-label="Search the docs" closedby="any" data-search-dialog>
 	<div class="field-row">
 		<div class="field large">
 			{% include icon.html name="search" class="field-icon" %}
-			<input aria-label="Search the docs" data-search-input placeholder="Search the docs..." type="search" />
+			{%- comment -%}
+			  Text and not search: a search input answers the first Escape by clearing itself, so
+			  the key that is meant to close the palette would only empty the field.
+			{%- endcomment -%}
+			<input aria-label="Search the docs" data-search-input placeholder="Search the docs..." type="text" />
 		</div>
 	</div>
 	<div class="results" data-search-results>

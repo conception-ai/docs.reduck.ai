@@ -30,8 +30,8 @@ sections:
       label: Get started
     - id: connect
       label: Connect your agent
-    - id: using-reduck
-      label: Using Reduck
+    - id: integrations
+      label: Integrations
     - id: security
       label: Security
 

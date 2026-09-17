@@ -3,9 +3,10 @@ layout: docs-shell
 ---
 
 {%- comment -%}
-  Scalar draws the operation list and the endpoints from the OpenAPI document. The app serves that
-  document without CORS headers, so a browser here cannot read it: `.github/workflows/pages.yml`
-  fetches it at build time and the copy in `assets/` is what this page opens.
+  Scalar draws the operation list and the endpoints from the MCP server's OpenAPI document — the
+  one mcp.reduck.ai/docs shows. The server serves it without CORS headers, so a browser here
+  cannot read it: `.github/workflows/pages.yml` fetches it at build time and the copy in `assets/`
+  is what this page opens.
 {%- endcomment -%}
 <div class="reference" id="api-reference-root"></div>
 
@@ -29,9 +30,6 @@ layout: docs-shell
 		--scalar-sidebar-item-hover-background: var(--color-grey-800);
 		--scalar-sidebar-item-hover-color: var(--color-grey-50);
 		--scalar-sidebar-item-active-background: var(--color-grey-800);
-		--scalar-sidebar-search-background: var(--color-grey-800);
-		--scalar-sidebar-search-border-color: var(--color-grey-700);
-		--scalar-sidebar-search-color: var(--color-grey-300);
 
 		/* The panel stands beside the docs nav, so it is the width of one. */
 		--scalar-sidebar-width: 280px;
@@ -39,7 +37,10 @@ layout: docs-shell
 		min-height: 100%;
 	}
 
-	#api-reference-root .scalar-mcp-layer {
+	/* Scalar's own promotion — its MCP layer, and the Developer Tools / Share / Deploy bar — has
+	   no place in someone else's docs. */
+	#api-reference-root .scalar-mcp-layer,
+	#api-reference-root .api-reference-toolbar {
 		display: none !important;
 	}
 </style>
@@ -53,7 +54,9 @@ layout: docs-shell
 		forceDarkModeState: "dark",
 		hideDarkModeToggle: true,
 		// The operation list, as a second panel beside the docs nav: the endpoints are not pages,
-		// so nothing else in the shell can list them.
-		showSidebar: true
+		// so nothing else in the shell can list them. Its search is not shown — ⌘K in the docs bar
+		// is the one search on the page.
+		showSidebar: true,
+		hideSearch: true
 	});
 </script>

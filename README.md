@@ -43,15 +43,36 @@ The prose starts here.
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `title`       | yes      | The page heading, and its entry in the nav panel                        |
 | `description` | yes      | The meta description, and the subtitle on a search hit                  |
-| `section`     | yes      | `get-started`, `connect`, `using-reduck` or `security`                  |
+| `section`     | yes      | `get-started`, `connect`, `integrations` or `security`                  |
 | `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
 | `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
+| `source`      | no       | A file under `assets/` whose contents are the page's body; see below    |
 
 `_docs/overview/` is special: it is served at `/`, not at `/overview`, because it is where a
 reader lands. Give it the lowest `order` so it leads the nav. A link written to it by slug lands
 on `/` as well.
 
 The four sections are fixed in `_config.yml`. A page names one; it cannot invent one.
+
+### A page something else publishes
+
+A page can be a document with an owner elsewhere — the CLI page is the README npm shows. Such a
+page is a folder with front matter only, and `source` names the file in `assets/` its body is read
+from:
+
+```markdown
+---
+title: CLI
+description: Run saved scripts from a terminal.
+section: integrations
+order: 220
+source: assets/cli-readme.md
+---
+```
+
+`.github/workflows/pages.yml` refreshes that file on every deploy, as it does `openapi.json`, so
+the site never holds a copy that can drift. The document's own `#` title, and anything above it,
+is dropped: the front matter is the title. A `source` that names no file fails the build.
 
 ## Images
 
@@ -174,10 +195,11 @@ sits on. External links are not checked.
 
 ## The API reference
 
-`/api-reference` is Scalar over the app's OpenAPI document. The app serves that document without
-CORS headers, so a browser here cannot read it: `.github/workflows/pages.yml` fetches it on every
-build and the copy in `assets/openapi.json` is what the page opens. The build also runs daily, so
-an endpoint added to the app shows up here without a push.
+`/api-reference` is Scalar over the MCP server's OpenAPI document — the REST door a caller uses,
+and the same document `mcp.reduck.ai/docs` shows. The server serves it without CORS headers, so a
+browser here cannot read it: `.github/workflows/pages.yml` fetches it on every build and the copy
+in `assets/openapi.json` is what the page opens. The build also runs daily, so an endpoint added
+to the server shows up here without a push.
 
 ## Publishing
 
@@ -236,5 +258,5 @@ Each one breaks the flow in a way no file here shows, so they are written down:
 | ------------------------- | ----------------------------------------------------------------- |
 | `_docs/`                  | One folder per page: the markdown and the images beside it        |
 | `_plugins/reduck_docs.rb` | The reader: tabs, tiles, callouts, steps, the nav tree, the index |
-| `_layouts/`, `_includes/` | The shell — the site header, the docs bar, the panel, the palette |
+| `_layouts/`, `_includes/` | The shell — the docs bar, the panel, the palette                  |
 | `assets/css/`             | `tokens.css` is the app's palette and type scale, restated        |
