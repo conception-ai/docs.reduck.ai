@@ -24,6 +24,13 @@
 	navToggle?.addEventListener("click", () => setNav(!nav?.classList.contains("open")));
 	scrim?.addEventListener("click", () => setNav(false));
 
+	// The panel is a layer over the page, and Escape is what dismisses a layer.
+	document.addEventListener("keydown", (event) => {
+		if (event.key !== "Escape" || !nav?.classList.contains("open")) return;
+		setNav(false);
+		navToggle?.focus();
+	});
+
 	for (const button of document.querySelectorAll("[data-disclosure]")) {
 		button.addEventListener("click", () => {
 			const open = button.getAttribute("aria-expanded") !== "true";
@@ -112,6 +119,10 @@
 	function close() {
 		if (dialog?.open) dialog.close();
 	}
+
+	// Whatever closed the palette — Escape, the backdrop, a chosen hit — the focus belongs on the
+	// button that opened it rather than on the body.
+	dialog?.addEventListener("close", () => trigger?.focus());
 
 	function snippetOf(text, term) {
 		const at = text.toLowerCase().indexOf(term);
@@ -208,7 +219,6 @@
 	}
 
 	trigger?.addEventListener("click", open);
-	trigger?.addEventListener("focus", open);
 
 	input?.addEventListener("input", () => {
 		active = 0;
@@ -219,12 +229,6 @@
 		const row = event.target.closest("a");
 		if (!row) return;
 		highlight(Array.from(results.querySelectorAll("a")).indexOf(row));
-	});
-
-	dialog?.addEventListener("click", (event) => {
-		// The dialog holds no cross, so the backdrop is what closes it: the click that lands on
-		// the dialog itself rather than on anything within it.
-		if (event.target === dialog) close();
 	});
 
 	dialog?.addEventListener("keydown", (event) => {

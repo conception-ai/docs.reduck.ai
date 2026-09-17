@@ -258,5 +258,5 @@ Each one breaks the flow in a way no file here shows, so they are written down:
 | ------------------------- | ----------------------------------------------------------------- |
 | `_docs/`                  | One folder per page: the markdown and the images beside it        |
 | `_plugins/reduck_docs.rb` | The reader: tabs, tiles, callouts, steps, the nav tree, the index |
-| `_layouts/`, `_includes/` | The shell — the site header, the docs bar, the panel, the palette |
+| `_layouts/`, `_includes/` | The shell — the docs bar, the panel, the palette                  |
 | `assets/css/`             | `tokens.css` is the app's palette and type scale, restated        |
