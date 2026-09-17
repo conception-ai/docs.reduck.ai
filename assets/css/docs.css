@@ -13,6 +13,7 @@
 	display: flex;
 	flex: 1;
 	min-height: 0;
+	position: relative;
 }
 
 .docs-body > main {
@@ -53,28 +54,55 @@
 }
 
 .docs-header .search {
+	align-items: center;
+	background: var(--color-grey-900);
+	border: 1px solid var(--color-grey-600);
+	border-radius: 12px;
+	color: var(--color-grey-400);
+	display: flex;
+	font-size: var(--font-size-medium);
+	gap: 0.625em;
+	min-height: 40px;
 	min-width: 0;
-	position: relative;
+	padding: 0 9px 0 0.875em;
+	transition: border-color 200ms;
 }
 
-/* Sits over the end of the field, which is readonly, so it can never cover text a reader is
-   typing. */
+.docs-header .search:hover {
+	border-color: var(--color-grey-500);
+}
+
+/* The icon and the chord sit in the row rather than over it: the button has no text of its own to
+   run underneath them. */
+.docs-header .search .field-icon {
+	color: var(--color-grey-500);
+	flex-shrink: 0;
+	font-size: 0.875em;
+	height: 1em;
+	position: static;
+	width: 1em;
+}
+
+.docs-header .search .placeholder {
+	flex: 1;
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .docs-header kbd {
 	align-items: center;
 	background: var(--color-grey-700);
 	border-radius: 4px;
 	color: var(--color-grey-300);
 	display: flex;
+	flex-shrink: 0;
 	font-family: inherit;
 	font-size: var(--font-size-small);
 	gap: 2px;
 	height: 22px;
 	padding: 0 7px;
-	pointer-events: none;
-	position: absolute;
-	right: 9px;
-	top: 50%;
-	translate: 0 -50%;
 }
 
 .docs-header .back {
@@ -96,14 +124,46 @@
 		display: inline-flex;
 	}
 
+	/* The way back to the app moves into the panel, which is where the rest of the navigation
+	   goes at this width. */
 	.docs-header .back {
 		display: none;
 	}
 }
 
+/* No room for a field beside the mark, and no chord to advertise on a screen this size: the
+   button keeps the icon alone and opens the same palette. */
 @media (width <= 640px) {
+	/* The two side columns share what the mark leaves, so the mark sits on the middle of the bar
+	   rather than on the middle of the gap between the burger and the button. */
+	.docs-header {
+		gap: 12px;
+		grid-template-columns: 1fr auto 1fr;
+	}
+
+	.docs-header .burger {
+		justify-self: start;
+	}
+
 	.docs-header .lockup {
+		justify-self: center;
 		width: 132px;
+	}
+
+	.docs-header .search {
+		justify-self: end;
+		padding: 0;
+		width: 40px;
+	}
+
+	.docs-header .search .field-icon {
+		font-size: 1em;
+		margin: 0 auto;
+	}
+
+	.docs-header .search .placeholder,
+	.docs-header kbd {
+		display: none;
 	}
 }
 
@@ -180,6 +240,10 @@
 	display: none;
 }
 
+.docs-sidebar > .back {
+	display: none;
+}
+
 .docs-scrim {
 	display: none;
 }
@@ -188,8 +252,8 @@
 	.docs-scrim.open {
 		background: rgb(0 0 0 / 0.5);
 		display: block;
-		inset: 130px 0 0;
-		position: fixed;
+		inset: 0;
+		position: absolute;
 		z-index: var(--z-dropdown);
 	}
 
@@ -198,13 +262,23 @@
 
 		/* Kept in the tree so the burger's aria-controls always names a real element. */
 		display: none;
-		inset: 130px auto 0 0;
-		position: fixed;
+		inset: 0 auto 0 0;
+		position: absolute;
+
+		/* A strip of the scrim stays uncovered on the narrowest screens, so the panel can always
+		   be dismissed by pressing beside it. */
+		width: min(280px, 100vw - 56px);
 		z-index: var(--z-dropdown);
 	}
 
 	.docs-sidebar.open {
 		display: flex;
+	}
+
+	.docs-sidebar > .back {
+		display: inline-flex;
+		margin-top: auto;
+		width: 100%;
 	}
 }
 
@@ -553,40 +627,46 @@
 /* ---------------------------------------------------------------- the ⌘K palette */
 
 /* A palette, not a centred modal: it hangs from the top of the window, holds no padding of its
-   own — the field and the list carry theirs — and scrolls inside its own height. */
+   own — the field and the list carry theirs — and scrolls inside its own height. It keeps this
+   shape at every width rather than filling a phone, so there is always backdrop around it to
+   press — which, with `closedby`, is what dismisses it where there is no key to press.
+
+   `dvh` rather than `vh`: a phone browser's toolbars are part of the height it reports. */
 dialog.docs-search {
 	background: var(--color-grey-800);
 	border: 1px solid var(--color-grey-700);
 	border-radius: 12px;
 	color: var(--text-color);
 	margin: 88px auto auto;
-	max-height: min(560px, calc(100vh - 128px));
+	max-height: min(560px, calc(100dvh - 128px));
 	max-width: none;
 	overflow: hidden;
 	padding: 0;
 	width: min(640px, calc(100vw - 32px));
 }
 
+/* A column only once it is open: a closed dialog is `display: none`, and naming the display here
+   unconditionally would show it. */
+dialog.docs-search[open] {
+	display: flex;
+	flex-direction: column;
+}
+
 dialog.docs-search::backdrop {
 	background: rgb(0 0 0 / 0.5);
 }
 
-/* Below this the dialog is a full-height sheet, which is the shape a search wants on a phone. */
-@media (width <= 768px) {
-	dialog.docs-search {
-		margin: 0;
-		max-height: 100vh;
-		width: 100vw;
-	}
-}
-
 dialog.docs-search .field-row {
 	border-bottom: 1px solid var(--color-grey-700);
+	flex-shrink: 0;
 	padding: 12px;
 }
 
+/* The field keeps its height and the list takes the rest, so the list is as tall as the frame
+   allows it to be rather than as tall as a second copy of the frame's arithmetic says. */
 dialog.docs-search .results {
-	max-height: calc(min(560px, 100vh - 128px) - 65px);
+	flex: 1;
+	min-height: 0;
 	overflow-y: auto;
 	padding: 8px;
 }

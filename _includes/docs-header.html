@@ -1,6 +1,8 @@
 {%- comment -%}
-  The bar under the site nav. Its field is the way in, not the field that is typed into: it is
-  readonly, and taking the focus raises the palette that carries the real one.
+  The bar under which the docs sit. Its search is the way into the palette, not a field that is
+  typed into: pressing it raises the palette, which carries the real one. It is a button and not a
+  readonly input, so the keyboard reaches it the way it reaches any button and Escape can hand the
+  focus back without the palette opening a second time.
 {%- endcomment -%}
 <header class="docs-header">
 	<button class="btn large btn-ghost icon-only burger" aria-controls="docs-nav" aria-expanded="false" aria-label="Open navigation" data-nav-toggle type="button">
@@ -11,11 +13,11 @@
 		<img alt="Reduck docs" height="22" src="{{ '/assets/img/reduck-docs.svg' | relative_url }}" width="176" />
 	</a>
 
-	<div class="search field large">
+	<button class="search" aria-keyshortcuts="Meta+K" aria-label="Search the docs" data-search-trigger type="button">
 		{% include icon.html name="search" class="field-icon" %}
-		<input aria-label="Search the docs" data-search-trigger placeholder="Search the docs..." readonly type="search" />
+		<span class="placeholder">Search the docs...</span>
 		<kbd aria-hidden="true" data-search-chord>⌘ K</kbd>
-	</div>
+	</button>
 
 	<a class="btn large btn-secondary back" href="{{ site.app_url }}">
 		{% include icon.html name="arrow-left" %}

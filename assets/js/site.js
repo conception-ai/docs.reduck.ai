@@ -1,19 +1,6 @@
-// The behaviour the chrome needs on every page: the burger's sheet, and the copy button a fenced
-// block carries.
+// The behaviour the chrome needs on every page: the copy button a fenced block carries.
 (() => {
 	"use strict";
-
-	const toggle = document.querySelector("[data-site-menu-toggle]");
-	const menu = document.querySelector("[data-site-menu]");
-
-	if (toggle && menu) {
-		toggle.addEventListener("click", () => {
-			const open = menu.classList.toggle("open");
-			menu.hidden = !open;
-			toggle.setAttribute("aria-expanded", String(open));
-			toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-		});
-	}
 
 	// The icon is swapped rather than re-rendered: the button holds one SVG, and only the paths
 	// inside it change.
