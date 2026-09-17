@@ -26,7 +26,10 @@ layout: docs-shell
 		min-height: 100%;
 	}
 
-	#api-reference-root .scalar-mcp-layer {
+	/* Scalar's own promotion — its MCP layer, and the Developer Tools / Share / Deploy bar it
+	   shows once its sidebar is off — has no place in someone else's docs. */
+	#api-reference-root .scalar-mcp-layer,
+	#api-reference-root .api-reference-toolbar {
 		display: none !important;
 	}
 </style>
