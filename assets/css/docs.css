@@ -41,8 +41,14 @@
 	gap: 16px;
 	grid-template-columns: 1fr minmax(0, 520px) 1fr;
 	min-height: 65px;
-	padding: 0 24px;
+	padding: 0 32px;
 	z-index: var(--z-foreground);
+}
+
+/* The way into the app is the one button on the bar, so it carries a little more weight than
+   the rest of the set. */
+.open-app {
+	font-weight: 600;
 }
 
 .docs-header .lockup {
@@ -50,12 +56,18 @@
 	border-radius: 4px;
 	display: flex;
 	justify-self: start;
-	width: 176px;
 }
 
-.docs-header .lockup img {
+/* The mark stands as tall as the one on reduck.ai's own bar, which is what 29.7px of box
+   comes to once the site name has its room under the baseline. */
+.docs-header .lockup .logo {
 	display: block;
-	width: 100%;
+	height: 29.7px;
+
+	/* The mark reads as centred on the bar a touch below the middle. */
+	position: relative;
+	top: 2px;
+	width: auto;
 }
 
 .docs-header .search {
@@ -110,7 +122,7 @@
 	padding: 0 7px;
 }
 
-.docs-header .back {
+.docs-header .open-app {
 	justify-self: end;
 	white-space: nowrap;
 }
@@ -129,9 +141,9 @@
 		display: inline-flex;
 	}
 
-	/* The way back to the app moves into the panel, which is where the rest of the navigation
+	/* The way into the app moves into the panel, which is where the rest of the navigation
 	   goes at this width. */
-	.docs-header .back {
+	.docs-header .open-app {
 		display: none;
 	}
 }
@@ -152,7 +164,10 @@
 
 	.docs-header .lockup {
 		justify-self: center;
-		width: 132px;
+	}
+
+	.docs-header .lockup .logo {
+		height: 22.8px;
 	}
 
 	.docs-header .search {
@@ -272,7 +287,7 @@
 	display: none;
 }
 
-.docs-sidebar > .back {
+.docs-sidebar > .open-app {
 	display: none;
 }
 
@@ -307,7 +322,7 @@
 		display: flex;
 	}
 
-	.docs-sidebar > .back {
+	.docs-sidebar > .open-app {
 		display: inline-flex;
 		width: 100%;
 	}
