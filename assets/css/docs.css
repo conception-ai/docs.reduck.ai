@@ -304,7 +304,6 @@
 
 	.docs-sidebar > .back {
 		display: inline-flex;
-		margin-top: auto;
 		width: 100%;
 	}
 }
