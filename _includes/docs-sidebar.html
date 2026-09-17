@@ -7,6 +7,15 @@
 <div class="docs-scrim" data-nav-scrim></div>
 
 <nav class="docs-sidebar" id="docs-nav" aria-label="Documentation">
+	{%- comment -%}
+	  The way back to the app, for the widths where the bar has no room for it. It leads the panel:
+	  the reader opened the panel to go somewhere, and leaving the docs is one of the places.
+	{%- endcomment -%}
+	<a class="btn large btn-secondary back" href="{{ site.app_url }}">
+		{% include icon.html name="arrow-left" %}
+		Back to Reduck
+	</a>
+
 	{%- for section in site.data.nav -%}
 		<section>
 			<h2>{{ section.label }}</h2>
@@ -43,12 +52,4 @@
 			</ul>
 		</section>
 	{%- endfor -%}
-
-	{%- comment -%}
-	  The way back to the app, for the widths where the bar has no room for it.
-	{%- endcomment -%}
-	<a class="btn large btn-secondary back" href="{{ site.app_url }}">
-		{% include icon.html name="arrow-left" %}
-		Back to Reduck
-	</a>
 </nav>
