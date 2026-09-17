@@ -62,7 +62,7 @@ That is the MCP specification's rule about token privilege, and it is why the to
 gives the MCP server is never passed on to the API: the MCP calls the API with a credential of its
 own instead. A stolen token is good for one door and nothing behind it.
 
-If you are minting a token yourself for the [REST API](/docs/api), ask for
+If you are minting a token yourself for the [REST API](/docs/api-reference), ask for
 `resource=https://reduck.ai`. A token obtained for the MCP will not work there, and the error will
 tell you so.
 

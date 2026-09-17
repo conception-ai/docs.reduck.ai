@@ -66,6 +66,31 @@ jobs:
                     echo "::warning::reduck.ai/api/openapi.json could not be read; keeping the committed copy."
                   fi
 
+            - name: Refresh the sourced pages
+              # Two pages are documents something else publishes — the MCP's overview, served by
+              # the server itself, and the CLI's README as npm shows it — read in by their
+              # `source` front matter. Same rule as above: a fetch that fails keeps the committed
+              # copy rather than failing the build.
+              run: |
+                  refresh() {
+                    if curl -fsS --max-time 30 "$1" -o /tmp/sourced && [ -s /tmp/sourced ]; then
+                      cp /tmp/sourced "released/assets/$2"
+                      cp /tmp/sourced "staged/assets/$2"
+                      echo "$2 refreshed."
+                    else
+                      echo "::warning::$1 could not be read; keeping the committed $2."
+                    fi
+                  }
+                  refresh https://mcp.reduck.ai/skill mcp-skill.md
+                  if curl -fsS --max-time 30 https://registry.npmjs.org/@reduck-ai/cli -o /tmp/cli.json; then
+                    python3 -c 'import json; print(json.load(open("/tmp/cli.json"))["readme"], end="")' > /tmp/sourced
+                    cp /tmp/sourced released/assets/cli-readme.md
+                    cp /tmp/sourced staged/assets/cli-readme.md
+                    echo "cli-readme.md refreshed."
+                  else
+                    echo "::warning::the npm registry could not be read; keeping the committed cli-readme.md."
+                  fi
+
             - uses: actions/configure-pages@v5
 
             - name: Build the released docs

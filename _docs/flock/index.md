@@ -1,7 +1,7 @@
 ---
 title: Flock apps
 description: Deploy a folder as a hosted page that runs Reduck scripts as whoever opens it.
-section: using-reduck
+section: integrations
 order: 260
 draft: true
 ---

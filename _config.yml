@@ -30,8 +30,8 @@ sections:
       label: Get started
     - id: connect
       label: Connect your agent
-    - id: using-reduck
-      label: Using Reduck
+    - id: integrations
+      label: Integrations
     - id: security
       label: Security
 
@@ -40,7 +40,6 @@ sections:
 # stands on its own, so the content loses the nesting and not the pages.
 nested_under:
     connect: connect-your-agent
-    using-reduck: using-reduck
 
 markdown: kramdown
 

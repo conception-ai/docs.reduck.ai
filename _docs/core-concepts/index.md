@@ -77,6 +77,17 @@ When to use which:
 A run on your own Chrome spends one run from your plan; a managed run also spends browser time.
 Plans and limits are on the [pricing page](https://reduck.ai/pricing).
 
+## Integrations
+
+Every script can be reached three ways. They run the same scripts on the same browsers; what
+differs is who is calling.
+
+| You want                                             | Use                                 |
+| ---------------------------------------------------- | ----------------------------------- |
+| An agent that finds and runs scripts for you         | [MCP](/docs/mcp)                    |
+| Scripts in a terminal, in parallel, or piped onward  | [The CLI](/docs/cli)                |
+| Calls from your own code, a cron, or an orchestrator | [The REST API](/docs/api-reference) |
+
 ## Parallel runs
 
 One execution of one script on one browser is a **run**. It gets an id, and that id is how you

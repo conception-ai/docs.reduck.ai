@@ -43,15 +43,36 @@ The prose starts here.
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `title`       | yes      | The page heading, and its entry in the nav panel                        |
 | `description` | yes      | The meta description, and the subtitle on a search hit                  |
-| `section`     | yes      | `get-started`, `connect`, `using-reduck` or `security`                  |
+| `section`     | yes      | `get-started`, `connect`, `integrations` or `security`                  |
 | `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
 | `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
+| `source`      | no       | A file under `assets/` whose contents are the page's body; see below    |
 
 `_docs/overview/` is special: it is served at `/`, not at `/overview`, because it is where a
 reader lands. Give it the lowest `order` so it leads the nav. A link written to it by slug lands
 on `/` as well.
 
 The four sections are fixed in `_config.yml`. A page names one; it cannot invent one.
+
+### A page something else publishes
+
+Two pages are documents with an owner elsewhere: the MCP's overview, which the server serves at
+`mcp.reduck.ai/skill`, and the CLI's README as npm shows it. Each is a folder with front matter
+only, and `source` names the file in `assets/` its body is read from:
+
+```markdown
+---
+title: CLI
+description: Run saved scripts from a terminal.
+section: integrations
+order: 220
+source: assets/cli-readme.md
+---
+```
+
+`.github/workflows/pages.yml` refreshes those files on every deploy, as it does `openapi.json`, so
+the site never holds a copy that can drift. The document's own `#` title, and anything above it,
+is dropped: the front matter is the title. A `source` that names no file fails the build.
 
 ## Images
 
