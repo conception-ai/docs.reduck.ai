@@ -43,7 +43,7 @@ The prose starts here.
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `title`       | yes      | The page heading, and its entry in the nav panel                        |
 | `description` | yes      | The meta description, and the subtitle on a search hit                  |
-| `section`     | yes      | `get-started`, `connect`, `integrations` or `security`                  |
+| `section`     | yes      | `get-started`, `connect` or `integrations`                              |
 | `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
 | `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
 | `source`      | no       | A file under `assets/` whose contents are the page's body; see below    |
@@ -52,7 +52,7 @@ The prose starts here.
 reader lands. Give it the lowest `order` so it leads the nav. A link written to it by slug lands
 on `/` as well.
 
-The four sections are fixed in `_config.yml`. A page names one; it cannot invent one.
+The three sections are fixed in `_config.yml`. A page names one; it cannot invent one.
 
 ### A page something else publishes
 

@@ -60,7 +60,7 @@ Reduck runs automation scripts using two main modes:
 
 > [!NOTE]
 > A managed browser starts with no session of yours, so a script that needs a login either signs
-> itself in, or uses a [connector](/docs/connectors): the cookies for one site, uploaded from your
+> itself in, or uses a connector: the cookies for one site, uploaded from your
 > own Chrome. Managed runs are enabled per account; the [REST API](/docs/api-reference) is the door
 > built for them.
 
