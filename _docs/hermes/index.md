@@ -10,7 +10,7 @@ Hermes installs from a script and reaches Reduck over OAuth.
 ## Before you start
 
 You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
-Both are in the [quick start](/docs/quick-start).
+Both are in the [quick start](/docs/overview#quick-start).
 
 Hermes needs a model provider of its own — it ships with none.
 

@@ -11,19 +11,23 @@ require "rouge"
 #
 #   * `:::tabs` / `::tab` — alternatives a reader picks between
 #   * `:::tiles` / `::tile` — a grid of links, each card clickable as a whole
+#   * `:::details <summary>` — prose folded under one line, for the reader who wants more
 #   * `::tiles-from <slug>` — the tiles another page owns, copied in before the page is read
+#   * `::video <uid> <title>` — a Cloudflare Stream video, by its id
 #
 # A page also comes apart into blocks rather than into one string of HTML: a fence, a callout and
 # a run of numbered steps each carry a frame of their own, which they cannot wear while they are
 # still inside the prose.
 module ReduckDocs
 	# What a run of prose is cut at. Only one starting at the start of a line counts — an indented
-	# fence belongs to the list item holding it, and stays in the prose so it renders inside that
-	# item.
+	# fence belongs to the step holding it. A step runs on through every indented line that
+	# follows its number, and blank lines — inside a step or between two — do not end the run, so
+	# a fence or a tiles group written under a step stays inside it and the steps stay one run.
 	BLOCK = /
 		^```([^\n]*)\r?\n(.*?)^```[ \t]*$
 		|^((?:>[^\n]*(?:\r?\n|$))+)
-		|^((?:\d+\.[ \t]+[^\n]*(?:\r?\n[ \t]+[^\n]*)*(?:\r?\n|$))+)
+		|^((?:\d+\.[ \t]+[^\n]*(?:(?:\r?\n[ \t]*)*\r?\n[ \t]+[^\n]*)*(?:\r?\n[ \t]*)*(?:\r?\n|$))+)
+		|^::video[ \t]+([a-f0-9]{32})(?:[ \t]+([^\n]*?))?[ \t]*$
 	/mx
 
 	# Where one numbered item ends and the next begins.
@@ -52,12 +56,14 @@ module ReduckDocs
 		"danger" => "circle-xmark"
 	}.freeze
 
-	GROUP_OPEN = /^:::(tabs|tiles)[ \t]*$/
+	# Only `details` takes a label — the line the group folds under.
+	GROUP_OPEN = /^:::(tabs|tiles|details)(?:[ \t]+(.+?))?[ \t]*$/
 	GROUP_CLOSE = /^:::[ \t]*$/
 	TAB_OPENER = /^::tab[ \t]+(.+?)[ \t]*$/
 	TILE_OPENER = /^::tile[ \t]+(.+?)[ \t]*$/
 	TILE_LINK = /\A\[([^\]]+)\]\(([^)]+)\)(?:[ \t]+icon:([a-z0-9_-]+))?\z/i
-	TILES_FROM = /^::tiles-from[ \t]+([a-z0-9-]+)[ \t]*$/
+	# The indent is kept so that a directive written under a step lands its group under that step.
+	TILES_FROM = /^([ \t]*)::tiles-from[ \t]+([a-z0-9-]+)[ \t]*$/
 
 	# The languages a grammar is loaded for; any other fence renders uncoloured, in the same frame.
 	HIGHLIGHTED = %w[bash typescript json toml].freeze
@@ -67,10 +73,16 @@ module ReduckDocs
 	APP_DOCS_LINK = %r{\]\(/docs(?:/([a-z0-9\-/]*))?(#[^)]*)?\)}
 
 	class Reader
-		def initialize(site)
+		# Every `/docs/…` link met while reading, with the page it sits on, for the generator to
+		# check once every page — and so every heading — is known.
+		attr_reader :links
+
+		def initialize(site, index_slug)
 			@site = site
+			@index_slug = index_slug
 			@markdown = site.find_converter_instance(Jekyll::Converters::Markdown)
 			@formatter = Rouge::Formatters::HTML.new
+			@links = []
 		end
 
 		# The page, as the list of blocks a layout walks.
@@ -91,8 +103,16 @@ module ReduckDocs
 					tabs.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tabs", "id" => "tabs-#{group}", "tabs" => tabs }
 					group += 1
 				when "tiles"
-					tiles = tiles_of(segment[:body])
+					tiles = tiles_of(slug, segment[:body])
 					tiles.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tiles", "tiles" => tiles }
+				when "details"
+					# Tiles and fences, but no tabs: folded prose is already one step aside from
+					# the page, and a choice inside it would be a second.
+					out << {
+						"kind" => "details",
+						"summary" => segment[:label].to_s.strip,
+						"blocks" => blocks(slug, segment[:body], allow_tabs: false)
+					}
 				end
 			end
 
@@ -103,6 +123,14 @@ module ReduckDocs
 		# so a page that borrows its tiles in turn holds none of its own: one hop only.
 		def tiles_group(body)
 			segments(body).find { |segment| segment[:kind] == "tiles" }&.fetch(:body)
+		end
+
+		# The page as one markdown document, for a reader — or an agent — to take away whole. It is
+		# the source with its title put back on top and its links made absolute, so it reads the
+		# same pasted anywhere.
+		def markdown(doc, body)
+			base = "#{@site.config["url"]}#{@site.baseurl}"
+			"# #{doc.data["title"]}\n\n#{doc.data["description"]}\n\n#{rewrite_links(body.strip, base)}\n"
 		end
 
 		private
@@ -126,7 +154,7 @@ module ReduckDocs
 				if group.nil?
 					if opener
 						flush.call
-						group = { kind: opener[1], lines: [], depth: 1 }
+						group = { kind: opener[1], label: opener[2], lines: [], depth: 1 }
 					else
 						text << line
 					end
@@ -138,7 +166,7 @@ module ReduckDocs
 				end
 
 				if group[:depth].zero?
-					out << { kind: group[:kind], body: group[:lines].join("\n") }
+					out << { kind: group[:kind], label: group[:label], body: group[:lines].join("\n") }
 					group = nil
 				else
 					group[:lines] << line
@@ -146,7 +174,7 @@ module ReduckDocs
 			end
 
 			# A group left open at the end of the page never said where it stops, so it is prose.
-			text.push(":::#{group[:kind]}", *group[:lines]) if group
+			text.push(":::#{group[:kind]} #{group[:label]}".strip, *group[:lines]) if group
 			flush.call
 			out
 		end
@@ -161,7 +189,12 @@ module ReduckDocs
 				push_html(slug, markdown[cursor...match.begin(0)], out)
 				cursor = match.end(0)
 
-				info, fenced, quote, steps = match.captures
+				info, fenced, quote, steps, video, title = match.captures
+
+				if video
+					out << { "kind" => "video", "id" => video, "title" => title.to_s.strip }
+					next
+				end
 
 				if quote
 					quoted = quote.gsub(/^>[ \t]?/, "").strip
@@ -177,11 +210,13 @@ module ReduckDocs
 				end
 
 				if steps
+					# A step holds blocks the way a tab panel does: its first run of prose is the
+					# line beside the numeral, and whatever follows — a fence, a callout, a tiles
+					# group — is drawn under it, inside the step.
 					items = steps.split(STEP).drop(1).map do |item|
-						# The wrap of a line is indented to sit under its number, which is layout
-						# in the source and would read as a code block once the marker is gone.
-						html = render(slug, item.gsub(/^[ \t]+/, "").strip)
-						LONE_PARAGRAPH.match(html)&.captures&.first || html
+						inner = blocks(slug, dedent(item), allow_tabs: false)
+						lead = inner.first&.fetch("kind") == "html" ? inner.shift["html"] : ""
+						{ "html" => LONE_PARAGRAPH.match(lead)&.captures&.first || lead, "blocks" => inner }
 					end
 					out << { "kind" => "steps", "items" => items } unless items.empty?
 					next
@@ -197,6 +232,15 @@ module ReduckDocs
 			push_html(slug, markdown[cursor..], out)
 		end
 
+		# The lines under a step's number are indented to sit beneath it, which is layout in the
+		# source and would read as a code block once the number is gone. Only that shared indent
+		# goes, so the indentation inside a fence is kept.
+		def dedent(item)
+			lines = item.strip.split(/\r?\n/)
+			indent = lines.drop(1).reject { |line| line.strip.empty? }.map { |line| line[/\A[ \t]*/].length }.min || 0
+			[lines.first, *lines.drop(1).map { |line| line[indent..] || "" }].join("\n")
+		end
+
 		def push_html(slug, markdown, out)
 			return if markdown.nil? || markdown.strip.empty?
 
@@ -204,22 +248,35 @@ module ReduckDocs
 		end
 
 		def render(slug, markdown)
-			html = @markdown.convert(rewrite_links(markdown))
+			html = @markdown.convert(rewrite_links(markdown, from: slug))
 			# An image is written beside the page that uses it, so its source is a bare file name.
-			# The page it renders on may be served from another path — `overview` answers at the
-			# root — so each is resolved against the page's own folder rather than the URL.
+			# The page it renders on may be served from another path — the index page answers at
+			# the root — so each is resolved against the page's own folder rather than the URL.
 			html.gsub(/(<img[^>]*\bsrc=")(?!https?:|data:|\/)([^"]+)(")/) do
 				"#{Regexp.last_match(1)}#{@site.baseurl}/#{slug}/#{Regexp.last_match(2)}#{Regexp.last_match(3)}"
 			end
 		end
 
-		def rewrite_links(markdown)
+		# `from` is the page the markdown belongs to; given, each link is recorded for the check.
+		# The markdown copy of a page passes none: its links are the page's, already recorded.
+		def rewrite_links(markdown, base = @site.baseurl, from: nil)
 			markdown.gsub(APP_DOCS_LINK) do
 				slug = Regexp.last_match(1)
 				hash = Regexp.last_match(2)
-				path = slug.nil? || slug.empty? ? "/" : "/#{slug}/"
-				"](#{@site.baseurl}#{path}#{hash})"
+				record(from, slug, hash) if from
+				"](#{base}#{path_of(slug)}#{hash})"
 			end
+		end
+
+		def record(from, slug, hash)
+			@links << { from: from, slug: slug.to_s.chomp("/"), hash: hash.to_s.delete_prefix("#") }
+		end
+
+		# The index page is served at the root, so a link written to it by slug has to land there
+		# too: `/overview/` is an address nothing answers at.
+		def path_of(slug)
+			slug = slug.to_s.chomp("/")
+			slug.empty? || slug == @index_slug ? "/" : "/#{slug}/"
 		end
 
 		def highlight(code, lang)
@@ -258,7 +315,7 @@ module ReduckDocs
 			tabs
 		end
 
-		def tiles_of(body)
+		def tiles_of(slug, body)
 			parts = body.split(TILE_OPENER)
 			tiles = []
 			(1...parts.length).step(2) do |i|
@@ -273,7 +330,7 @@ module ReduckDocs
 
 				tile = {
 					"label" => label,
-					"href" => rewrite_href(href),
+					"href" => rewrite_href(slug, href),
 					"note" => parts[i + 1].to_s.strip.gsub(/\s+/, " ")
 				}
 				tile["icon"] = icon if icon
@@ -282,11 +339,12 @@ module ReduckDocs
 			tiles
 		end
 
-		def rewrite_href(href)
+		def rewrite_href(from, href)
 			return href unless href.start_with?("/docs")
 
-			rest = href.delete_prefix("/docs").delete_prefix("/")
-			rest.empty? ? "#{@site.baseurl}/" : "#{@site.baseurl}/#{rest.chomp('/')}/"
+			target, hash = href.delete_prefix("/docs").delete_prefix("/").split("#", 2)
+			record(from, target, hash)
+			"#{@site.baseurl}#{path_of(target)}#{hash ? "##{hash}" : ""}"
 		end
 	end
 
@@ -298,13 +356,14 @@ module ReduckDocs
 			collection = site.collections["docs"]
 			return if collection.nil?
 
-			reader = Reader.new(site)
 			index_slug = site.config["index_slug"] || "overview"
+			reader = Reader.new(site, index_slug)
 
 			pages = collection.docs.map do |doc|
 				slug = File.basename(File.dirname(doc.relative_path))
 				doc.data["slug"] = slug
 				doc.data["permalink"] = slug == index_slug ? "/" : "/#{slug}/"
+				doc.content = sourced(site, doc) if doc.data["source"]
 				doc
 			end
 
@@ -314,30 +373,69 @@ module ReduckDocs
 
 			pages.each do |doc|
 				body = doc.content.gsub(TILES_FROM) do
-					group = owned[Regexp.last_match(1)]
+					indent, name = Regexp.last_match.captures
+					group = owned[name]
 					if group.nil?
-						Jekyll.logger.warn "Docs:", "::tiles-from names \"#{Regexp.last_match(1)}\", which holds no tiles group"
+						Jekyll.logger.warn "Docs:", "::tiles-from names \"#{name}\", which holds no tiles group"
 						""
 					else
-						":::tiles\n#{group}\n:::"
+						":::tiles\n#{group}\n:::".gsub(/^/, indent)
 					end
 				end
 
 				doc.data["blocks"] = reader.blocks(doc.data["slug"], body)
 				doc.data["search_text"] = plain_text(doc.data["blocks"])
 				doc.data["search_headings"] = headings(doc.data["blocks"])
+				site.pages << markdown_page(site, doc, reader.markdown(doc, body))
 
 				# Every layout reads `page.blocks`; leaving the markdown in place would only have
 				# kramdown convert it a second time, to output nothing renders.
 				doc.content = ""
 			end
 
+			check_links(reader.links, pages, index_slug)
 			site.data["nav"] = nav(site, pages)
 			link_next(site.data["nav"], pages)
 			site.pages << search_index(site, pages)
 		end
 
 		private
+
+		# Every `/docs/<slug>#anchor` link names a page that exists and, with an anchor, an id that
+		# page renders. A miss fails the build — on the laptop, in the PR check and in the deploy
+		# alike — and names the page it sits on, so the fix is one edit away. External links are
+		# not looked at: they are outside this repository's control.
+		# A page whose body is a document something else publishes — the CLI's README on npm —
+		# fetched into `assets/` by the deploy workflow so the site never
+		# holds a copy that can drift. The document's own title, and whatever sits above it (a
+		# logo, badges), is dropped: the front matter is the title here. A missing file fails the
+		# build, because the page would otherwise publish empty and nothing would say so.
+		def sourced(site, doc)
+			path = File.join(site.source, doc.data["source"])
+			unless File.file?(path)
+				raise Jekyll::Errors::FatalException, "#{doc.relative_path}: source \"#{doc.data["source"]}\" is not a file"
+			end
+
+			File.read(path).sub(/\A.*?^#[ \t]+[^\n]*\n/m, "")
+		end
+
+		def check_links(links, pages, index_slug)
+			ids = pages.to_h do |doc|
+				[doc.data["slug"], doc.data["blocks"].flat_map { |block| strings(block) }.join.scan(/\bid="([^"]+)"/).flatten]
+			end
+
+			dead = links.uniq.filter_map do |link|
+				slug = link[:slug].empty? ? index_slug : link[:slug]
+				if !ids.key?(slug)
+					"#{link[:from]}: /docs/#{link[:slug]} — no such page"
+				elsif !link[:hash].empty? && !ids[slug].include?(link[:hash])
+					"#{link[:from]}: /docs/#{link[:slug]}##{link[:hash]} — #{slug} has no heading with that id"
+				end
+			end
+			return if dead.empty?
+
+			raise Jekyll::Errors::FatalException, "Dead links:\n  #{dead.join("\n  ")}"
+		end
 
 		# The nav panel: the published pages grouped under their section, each section in the order
 		# the config fixes and each page in the order its front matter asked for. A section no page
@@ -390,6 +488,19 @@ module ReduckDocs
 			end
 		end
 
+		# The page's markdown, served beside its HTML as `index.md`: what the copy button on the
+		# page takes, and what an agent asks for when it wants the page and not the shell around
+		# it. Named `.txt` on the way in because a name ending in `.md` would be handed to kramdown
+		# and come out as HTML; the permalink is what gives it its address.
+		def markdown_page(site, doc, text)
+			page = Jekyll::PageWithoutAFile.new(site, site.source, "", "index.txt")
+			page.content = text
+			page.data["layout"] = nil
+			page.data["permalink"] = "#{doc.data["permalink"]}index.md"
+			page.data["sitemap"] = false
+			page
+		end
+
 		def search_index(site, pages)
 			entries = pages.reject { |doc| doc.data["draft"] || doc.data["search"] == false }.map do |doc|
 				{
@@ -420,10 +531,12 @@ module ReduckDocs
 		def strings(block)
 			case block["kind"]
 			when "html", "banner" then [block["html"]]
-			when "steps" then block["items"]
+			when "steps" then block["items"].flat_map { |item| [item["html"], *item["blocks"].flat_map { |inner| strings(inner) }] }
 			when "code" then [block["code"]]
 			when "tabs" then block["tabs"].flat_map { |tab| [tab["label"], *tab["blocks"].flat_map { |inner| strings(inner) }] }
 			when "tiles" then block["tiles"].flat_map { |tile| [tile["label"], tile["note"]] }
+			when "details" then [block["summary"], *block["blocks"].flat_map { |inner| strings(inner) }]
+			when "video" then [block["title"]]
 			else []
 			end
 		end

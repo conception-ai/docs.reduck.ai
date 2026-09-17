@@ -8,11 +8,12 @@ too, so a change to the wording is a push and nothing else.
 
 ```sh
 bundle install
-bundle exec jekyll serve
+bundle exec jekyll serve --livereload
 ```
 
-Then open <http://127.0.0.1:4000>. An edit shows on the next reload — `serve` watches the folder
-and rebuilds. Ruby 3.3 or later, and nothing else.
+Then open <http://127.0.0.1:4000>. `serve` watches the folder and rebuilds on an edit, and
+`--livereload` refreshes the open tab when it has. The one thing it does not pick up is a change
+to `_plugins/`: stop and start it for that. Ruby 3.3 or later, and nothing else.
 
 ```sh
 bundle exec jekyll build              # write _site/ once, without serving
@@ -42,14 +43,36 @@ The prose starts here.
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `title`       | yes      | The page heading, and its entry in the nav panel                        |
 | `description` | yes      | The meta description, and the subtitle on a search hit                  |
-| `section`     | yes      | `get-started`, `connect`, `core-concepts`, `using-reduck` or `security` |
+| `section`     | yes      | `get-started`, `connect`, `integrations` or `security`                  |
 | `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
 | `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
+| `source`      | no       | A file under `assets/` whose contents are the page's body; see below    |
 
 `_docs/overview/` is special: it is served at `/`, not at `/overview`, because it is where a
-reader lands. Give it the lowest `order` so it leads the nav.
+reader lands. Give it the lowest `order` so it leads the nav. A link written to it by slug lands
+on `/` as well.
 
-The five sections are fixed in `_config.yml`. A page names one; it cannot invent one.
+The four sections are fixed in `_config.yml`. A page names one; it cannot invent one.
+
+### A page something else publishes
+
+A page can be a document with an owner elsewhere — the CLI page is the README npm shows. Such a
+page is a folder with front matter only, and `source` names the file in `assets/` its body is read
+from:
+
+```markdown
+---
+title: CLI
+description: Run saved scripts from a terminal.
+section: integrations
+order: 220
+source: assets/cli-readme.md
+---
+```
+
+`.github/workflows/pages.yml` refreshes that file on every deploy, as it does `openapi.json`, so
+the site never holds a copy that can drift. The document's own `#` title, and anything above it,
+is dropped: the front matter is the title. A `source` that names no file fails the build.
 
 ## Images
 
@@ -89,12 +112,23 @@ Custom connector
 :::
 ```
 
+**Details** — prose folded under one line, for the reader who wants more than the step says:
+
+```markdown
+:::details More about pairing
+Prose, fences, tiles, a video.
+:::
+```
+
 A tiles group can sit inside a tab. A tabs group inside a tab is not read as one, and stays on the
 page as the text it is. A group with nothing readable in it renders as plain text rather than as
 an empty bar or grid, so a typo shows rather than disappears.
 
-Every fenced code block gets a copy button. Nothing else does — a fence is the thing a reader
-copies, and a button on each paragraph would be noise.
+Two things carry a copy button: every fenced code block, and the page itself. The page's button
+copies its markdown — the source with the title on top and its links made absolute — which is
+also served beside the page as `index.md` (`/projects/index.md`), for an agent that wants the
+page without the shell around it. Nothing else gets one: a button on each paragraph would be
+noise.
 
 ### Showing another page's tiles
 
@@ -125,20 +159,47 @@ A blockquote is a callout. GitHub's alert syntax says which kind:
 `NOTE` and `IMPORTANT` read as a note, `TIP` as a success, `WARNING` as a warning, `CAUTION` as a
 danger. A blockquote that opens with none is a note.
 
-A run of numbered lines is drawn as joined steps rather than as an ordinary list.
+A run of numbered lines is drawn as joined steps rather than as an ordinary list. A step holds
+whatever is indented under its number — a fence, a callout, a tiles group, `::tiles-from` — and
+draws it inside the step, so the run stays one run:
+
+````markdown
+3. Install Reduck MCP:
+
+    ```bash
+    claude mcp add reduck --transport http --scope user https://mcp.reduck.ai
+    ```
+
+4. Start a new session.
+````
+
+A video is one line naming its Cloudflare Stream id, then its title:
+
+```markdown
+::video de9cf994bb67e90bdecc4e37a450bbb3 Restart pairing from the Reduck extension
+```
+
+It renders Stream's player in a 16:9 box, and the title declares it to crawlers as a video. The
+upload itself is the `cloudflare-stream-video` skill in the code repository, and
+`_includes/stream.html` is what a layout calls when it needs more than the line gives — a
+description, an upload date, a duration.
 
 `h2` and `h3` are what the search index reads as a page's structure, so use them to break a page up
 rather than jumping to `h4`.
 
 A link written as `/docs/<slug>` — the shape the app used when it served these pages under a path
-— is rewritten to `/<slug>/`, so prose can move between the two without editing.
+— is rewritten to `/<slug>/`, so prose can move between the two without editing. Write every
+internal link that way: each one is checked when the site builds, and a link to a page that does
+not exist, or to a `#heading` the page does not render, fails the build and names the page it
+sits on. External links are not checked.
 
 ## The API reference
 
-`/api-reference` is Scalar over the app's OpenAPI document. The app serves that document without
-CORS headers, so a browser here cannot read it: `.github/workflows/pages.yml` fetches it on every
-build and the copy in `assets/openapi.json` is what the page opens. The build also runs daily, so
-an endpoint added to the app shows up here without a push.
+`/api-reference` is Scalar over the MCP server's OpenAPI document — the REST door a caller uses,
+and the same document `mcp.reduck.ai/docs` shows. The server serves it without CORS headers, so a
+browser here cannot read it: `.github/workflows/pages.yml` fetches it on every build and the copy
+in `assets/openapi.json` is what the page opens. The build also runs daily, so an endpoint added
+to the server shows up here without a push.
 
 ## Publishing
 

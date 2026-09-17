@@ -7,7 +7,7 @@ name: Deploy
 on:
     push:
         branches: [main, staging]
-    # The API reference is drawn from the app's OpenAPI document, which is fetched at build time.
+    # The API reference is drawn from the MCP server's OpenAPI document, fetched at build time.
     # A daily build is what keeps it in step with an app that ships without touching this
     # repository.
     schedule:
@@ -50,20 +50,35 @@ jobs:
                   ruby-version: "3.3"
 
             - name: Refresh the OpenAPI document
-              # The app serves it without CORS headers, so a browser on this domain cannot read it
-              # and the copy in `assets/` is what the page opens. `servers` is rewritten because
-              # the document names `/`, which on this domain points at a site that serves no API.
-              # A fetch that fails leaves the committed copy in place rather than failing the
-              # build: stale endpoints beat no reference at all. Both builds read production's
-              # document — the staged docs are prose ahead of a release, not a second API.
+              # The REST API a caller uses is the MCP server's — run a script, read a run or a
+              # batch, list scripts — and mcp.reduck.ai/docs is that same document. It is served
+              # without CORS headers, so a browser on this domain cannot read it and the copy in
+              # `assets/` is what the page opens. A fetch that fails leaves the committed copy in
+              # place rather than failing the build: stale endpoints beat no reference at all.
+              # Both builds read production's document — the staged docs are prose ahead of a
+              # release, not a second API.
               run: |
-                  if curl -fsS --max-time 30 https://reduck.ai/api/openapi.json -o /tmp/openapi.json; then
-                    python3 -c 'import json; spec=json.load(open("/tmp/openapi.json")); spec["servers"]=[{"url":"https://reduck.ai"}]; json.dump(spec, open("/tmp/openapi.rewritten.json","w"), indent=2)'
-                    cp /tmp/openapi.rewritten.json released/assets/openapi.json
-                    cp /tmp/openapi.rewritten.json staged/assets/openapi.json
+                  if curl -fsS --max-time 30 https://mcp.reduck.ai/openapi.json -o /tmp/openapi.json; then
+                    python3 -c 'import json; json.dump(json.load(open("/tmp/openapi.json")), open("/tmp/openapi.pretty.json","w"), indent=2)'
+                    cp /tmp/openapi.pretty.json released/assets/openapi.json
+                    cp /tmp/openapi.pretty.json staged/assets/openapi.json
                     echo "OpenAPI document refreshed."
                   else
-                    echo "::warning::reduck.ai/api/openapi.json could not be read; keeping the committed copy."
+                    echo "::warning::mcp.reduck.ai/openapi.json could not be read; keeping the committed copy."
+                  fi
+
+            - name: Refresh the CLI README
+              # The CLI page is the README npm shows, read in by its `source` front matter. Same
+              # rule as above: a fetch that fails keeps the committed copy rather than failing the
+              # build.
+              run: |
+                  if curl -fsS --max-time 30 https://registry.npmjs.org/@reduck-ai/cli -o /tmp/cli.json; then
+                    python3 -c 'import json; print(json.load(open("/tmp/cli.json"))["readme"], end="")' > /tmp/sourced
+                    cp /tmp/sourced released/assets/cli-readme.md
+                    cp /tmp/sourced staged/assets/cli-readme.md
+                    echo "cli-readme.md refreshed."
+                  else
+                    echo "::warning::the npm registry could not be read; keeping the committed cli-readme.md."
                   fi
 
             - uses: actions/configure-pages@v5

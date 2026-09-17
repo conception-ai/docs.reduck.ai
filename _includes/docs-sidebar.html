@@ -1,7 +1,8 @@
 {%- comment -%}
   The panel of pages. A hub's list opens on its own only when the page the reader is on is one of
   the pages beneath it — going to the hub is reading it, not asking what it holds, and the chevron
-  is what asks that.
+  is what asks that. The chevron leads the row, in a slot every row keeps so the labels line up;
+  the row is one surface under the pointer, the chevron the one part of it that toggles.
 {%- endcomment -%}
 <div class="docs-scrim" data-nav-scrim></div>
 
@@ -18,13 +19,13 @@
 						{%- if child.slug == page.slug %}{% assign holds_current = true %}{% endif -%}
 					{%- endfor -%}
 					<li>
-						<div class="row">
-							<a class="nav-link{% if is_current %} toggled{% endif %}" {% if is_current %}aria-current="page"{% endif %} href="{{ entry.url | relative_url }}">{{ entry.title }}</a>
+						<div class="row{% if is_current %} toggled{% endif %}">
 							{%- if entry.children -%}
 								<button class="disclosure" aria-controls="nav-{{ entry.slug }}" aria-expanded="{{ holds_current }}" aria-label="Show pages under {{ entry.title }}" data-disclosure type="button">
 									{% include icon.html name="chevron-right" %}
 								</button>
 							{%- endif -%}
+							<a class="nav-link" {% if is_current %}aria-current="page"{% endif %} href="{{ entry.url | relative_url }}">{{ entry.title }}</a>
 						</div>
 						{%- if entry.children -%}
 							<ul class="children" id="nav-{{ entry.slug }}" {% unless holds_current %}hidden{% endunless %}>

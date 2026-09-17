@@ -10,7 +10,7 @@ OpenClaw reaches Reduck over streamable HTTP, and runs it through a local gatewa
 ## Before you start
 
 You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
-Both are in the [quick start](/docs/quick-start).
+Both are in the [quick start](/docs/overview#quick-start).
 
 OpenClaw needs **Node 20 or later**, and a model provider of its own — it ships with none.
 
