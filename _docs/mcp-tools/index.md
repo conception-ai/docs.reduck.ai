@@ -5,7 +5,7 @@ section: using-reduck
 order: 210
 ---
 
-Once your agent is [connected](/docs/quick-start), Reduck appears to it as a set of tools. You
+Once your agent is [connected](/docs/overview#quick-start), Reduck appears to it as a set of tools. You
 never call these yourself, but knowing what exists tells you what to ask for — and lets you name a
 tool when the agent picks the wrong one.
 

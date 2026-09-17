@@ -1,5 +1,5 @@
 ---
-title: Quick start
+title: Overview
 description: Create an account, pair your browser, connect your agent to Reduck MCP, and run your first automation.
 section: get-started
 order: 10

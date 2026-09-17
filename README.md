@@ -47,7 +47,7 @@ The prose starts here.
 | `order`       | yes      | Position in the nav panel, ascending. Leave gaps — 10, 20, 30           |
 | `draft`       | no       | `true` keeps it out of the nav, the sitemap and the search index        |
 
-`_docs/quick-start/` is special: it is served at `/`, not at `/quick-start`, because it is where a
+`_docs/overview/` is special: it is served at `/`, not at `/overview`, because it is where a
 reader lands. Give it the lowest `order` so it leads the nav. A link written to it by slug lands
 on `/` as well.
 

@@ -244,7 +244,7 @@ module ReduckDocs
 		end
 
 		# The index page is served at the root, so a link written to it by slug has to land there
-		# too: `/quick-start/` is an address nothing answers at.
+		# too: `/overview/` is an address nothing answers at.
 		def path_of(slug)
 			slug = slug.to_s.chomp("/")
 			slug.empty? || slug == @index_slug ? "/" : "/#{slug}/"
@@ -325,7 +325,7 @@ module ReduckDocs
 			collection = site.collections["docs"]
 			return if collection.nil?
 
-			index_slug = site.config["index_slug"] || "quick-start"
+			index_slug = site.config["index_slug"] || "overview"
 			reader = Reader.new(site, index_slug)
 
 			pages = collection.docs.map do |doc|

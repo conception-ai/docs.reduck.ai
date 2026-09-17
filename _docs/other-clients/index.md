@@ -11,7 +11,7 @@ There is nothing to install and no package to run.
 ## Before you start
 
 You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
-Both are in the [quick start](/docs/quick-start).
+Both are in the [quick start](/docs/overview#quick-start).
 
 ## Let your agent do it
 
