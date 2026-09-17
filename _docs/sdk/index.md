@@ -62,7 +62,7 @@ the MCP server is rejected here; see [Authentication](/docs/authentication).
 | `transferScript`                    | `path: { handle, host, slug }`, `body: { target }`                        |
 
 `handle` is `@username` for your own scripts, or a project slug for a
-[project](/docs/projects)'s. List functions return `{ data, hasNextPage }`.
+[project](/docs/core-concepts#projects)'s. List functions return `{ data, hasNextPage }`.
 
 Running a script is not in this table: the SDK manages the catalogue, and runs go through
 `POST /run`, the MCP, or the [CLI](/docs/cli).

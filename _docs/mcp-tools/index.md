@@ -17,7 +17,7 @@ The usual path is three tools deep: **find** a script, **read** its contract, **
 | ------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | `list_scripts`     | Search the scripts you can run: your own, your projects', and the official catalogue.                             |
 | `read_script`      | One script's contract — arguments, output, whether it needs a login, whether it changes anything.                 |
-| `run_script`       | Run it, on a [device](/docs/devices) or a [managed browser](/docs/browsers). One script, or up to twenty at once. |
+| `run_script`       | Run it, on a [device](/docs/devices) or a [managed browser](/docs/core-concepts#browser). One script, or up to twenty at once. |
 | `list_runs`        | Your [runs](/docs/runs), newest first.                                                                            |
 | `read_run_results` | What a run returned, by run id or batch id.                                                                       |
 | `read_run_trace`   | The steps and screenshots behind a run.                                                                           |

@@ -27,8 +27,6 @@ sections:
       label: Get started
     - id: connect
       label: Connect your agent
-    - id: core-concepts
-      label: Core concepts
     - id: using-reduck
       label: Using Reduck
     - id: security

@@ -11,7 +11,7 @@ agent for `whoami` to see all three at once, with the date they reset.
 | Counter                         | Spent by                                   | If you hit it                                      |
 | ------------------------------- | ------------------------------------------ | -------------------------------------------------- |
 | **Monthly script runs**         | Every run, on any browser                  | A bigger plan is the only lever.                   |
-| **Cloud browser time**          | [Managed](/docs/browsers) runs, per minute | Run on your paired browser instead.                |
+| **Cloud browser time**          | [Managed](/docs/core-concepts#browser) runs, per minute | Run on your paired browser instead.                |
 | **Residential proxy bandwidth** | Managed runs that set a `country`          | Drop the `country` and egress from the datacenter. |
 
 A run on your own Chrome spends nothing but the run count: the browser is yours, and the traffic is
@@ -44,4 +44,4 @@ setting on your account.
 Managed runs are entitled per account, not just metered. Where an account does not have them, the
 option is absent from what the agent is offered rather than failing at the moment of the run —
 so an agent cannot spend cloud browser time you did not agree to. The REST API is the door built
-for managed runs; see [Browsers](/docs/browsers).
+for managed runs; see [Browsers](/docs/core-concepts#browser).

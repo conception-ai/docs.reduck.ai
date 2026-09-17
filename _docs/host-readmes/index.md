@@ -1,8 +1,8 @@
 ---
 title: Host READMEs
 description: Notes an owner attaches to a website, shared by every script that targets it.
-section: core-concepts
-order: 180
+section: using-reduck
+order: 295
 ---
 
 Some things are true of a site rather than of one script on it: which account to use, a rate limit

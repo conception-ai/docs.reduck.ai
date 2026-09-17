@@ -60,5 +60,5 @@ its own actions, the fix belongs where it started, not in a retry.
   and so does the next agent that touches one.
 - **Run it twice, on different days.** A script passes in the session it was built in and fails on
   the second run more often than any other way. A second run in a clean browser is the real test.
-- **Keep it private or share it.** A new script is yours; move it to a [project](/docs/projects) for
-  your team, or make it public for everyone. See [Scripts](/docs/scripts).
+- **Keep it private or share it.** A new script is yours; move it to a [project](/docs/core-concepts#projects) for
+  your team, or make it public for everyone. See [Scripts](/docs/core-concepts#scripts).

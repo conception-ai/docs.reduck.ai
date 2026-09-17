@@ -1,8 +1,8 @@
 ---
 title: Runs, batches and traces
 description: Every script execution is a run with an id — how to read its result, its evidence, and what changes when you run several at once.
-section: core-concepts
-order: 160
+section: using-reduck
+order: 280
 ---
 
 One execution of one script on one browser is a **run**. It gets an id, and that id is how you

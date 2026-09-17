@@ -12,7 +12,7 @@ Get it from the
 [Chrome Web Store](https://chromewebstore.google.com/detail/reduck/koccidjchcojlmgkdhibpgjbnhcoopio),
 then open its side panel from the toolbar.
 
-> The extension is only needed for runs on your own Chrome. [Managed browsers](/docs/browsers) need
+> The extension is only needed for runs on your own Chrome. [Managed browsers](/docs/core-concepts#browser) need
 > nothing installed.
 
 ## Pairing
@@ -38,7 +38,7 @@ session your browser already holds.
 ## Connectors
 
 **Manage connectors** uploads the cookies you hold for one site, so a
-[managed browser](/docs/browsers) can act as you there. That is the only way a site's session
+[managed browser](/docs/core-concepts#browser) can act as you there. That is the only way a site's session
 leaves your machine, it is one site at a time, and it happens because you asked for it.
 
 [Connectors](/docs/connectors) covers what is stored and how it is protected.

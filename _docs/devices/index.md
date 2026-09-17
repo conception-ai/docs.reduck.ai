@@ -1,8 +1,8 @@
 ---
 title: Devices
 description: Every browser you pair with Reduck is a device — how to pair several, and how to pick which one a script runs on.
-section: core-concepts
-order: 150
+section: using-reduck
+order: 270
 ---
 
 A **device** is one browser paired to your account. It is what "bring your own browser" means in
@@ -37,7 +37,7 @@ When your agent runs a script it can name a target:
 | `"extension"`       | Your extension device is picked — as long as exactly one is paired. |
 | `"local"`           | The same, for a CLI device.                                         |
 | `{"deviceId": "…"}` | That one device, whichever kind it is.                              |
-| `"managed"`         | No device at all: a [managed browser](/docs/browsers).              |
+| `"managed"`         | No device at all: a [managed browser](/docs/core-concepts#browser).              |
 
 `"extension"` and `"local"` fail when two or more devices match, because there is no right answer
 to pick between them. Name a `deviceId` when you have several.

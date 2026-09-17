@@ -1,8 +1,8 @@
 ---
 title: Script versions
 description: Every script is a line of versions — drafts you can edit and test, and promoted versions that never change.
-section: core-concepts
-order: 170
+section: using-reduck
+order: 290
 ---
 
 A script is not one body of code but a line of **versions**. A version is a snapshot of the code
