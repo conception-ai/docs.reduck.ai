@@ -10,7 +10,7 @@
 	</button>
 
 	<a class="lockup" aria-label="Reduck docs" href="{{ '/' | relative_url }}">
-		<img alt="Reduck docs" height="22" src="{{ '/assets/img/reduck-docs.svg' | relative_url }}" width="176" />
+		<img class="logo" alt="Reduck docs" height="41" src="{{ '/assets/img/reduck-docs.svg' | relative_url }}" width="277.7" />
 	</a>
 
 	<button class="search" aria-keyshortcuts="Meta+K" aria-label="Search the docs" data-search-trigger type="button">
@@ -19,8 +19,8 @@
 		<kbd aria-hidden="true" data-search-chord>⌘ K</kbd>
 	</button>
 
-	<a class="btn large btn-secondary back" href="{{ site.app_url }}">
-		{% include icon.html name="arrow-left" %}
-		Back to Reduck
+	<a class="btn medium btn-primary open-app" href="{{ site.app_url }}/projects">
+		{% include icon.html name="objects-column" %}
+		Open app
 	</a>
 </header>
