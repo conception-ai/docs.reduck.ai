@@ -19,6 +19,9 @@ Reduck offers two visibility levels for scripts:
 - **Private scripts** remain yours alone. To share them with your team, assign them to a
   [project](#projects) and grant your team access to that project.
 
+A script is a line of **versions**. A draft is edited and tested, then promoted, and a promoted
+version never changes, so an argument that worked last week works today.
+
 ### Official scripts library
 
 ![The official library at reduck.ai/explore](official-library.png)
@@ -48,7 +51,8 @@ Reduck runs automation scripts using two main modes:
 - **Default: Bring your own browser (BYOB)**. Browser automation happens on your browser through
   the Reduck extension. The automation automatically inherits your browser state, e.g. which site
   you are logged in, browser fingerprints for stealth, etc. but **requires your browser to be
-  open**.
+  open**. Each browser you pair is a **device** with its own id: pair several, and a run can name
+  which one.
 - **Managed browser**. Browser automation happens on Reduck managed Cloud so that you can run
   automations 24/7 without having to have your browser accessible and can scale better than your
   machine. Managed browser is subject to a different pricing (more expensive) than BYOB (see our
@@ -70,6 +74,9 @@ When to use which:
 | Availability | Needs your browser open         | 24/7                                           |
 | Network      | Your connection                 | Datacenter, or a residential proxy per country |
 
+A run on your own Chrome spends one run from your plan; a managed run also spends browser time.
+Plans and limits are on the [pricing page](https://reduck.ai/pricing).
+
 ## Parallel runs
 
 One execution of one script on one browser is a **run**. It gets an id, and that id is how you
@@ -82,6 +89,3 @@ per script.
 Each device runs **4 scripts at a time** by default. Ask for more and the rest queue and start as
 slots free up: a run sitting in `queued` is waiting its turn, not failing. Raise or lower the number
 per device at [reduck.ai/devices](https://reduck.ai/devices).
-
-[Runs, batches and traces](/docs/runs) covers reading results back and chaining scripts through one
-browser.

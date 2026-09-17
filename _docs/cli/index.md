@@ -51,8 +51,8 @@ arrays or objects are passed as JSON (`ids=[1,2]`).
 | Option              | What it does                                                           |
 | ------------------- | ---------------------------------------------------------------------- |
 | `--script <addr…>`  | The script and its arguments. Repeat it to run several.                |
-| `--device <id>`     | Run on one named [device](/docs/devices) instead of auto-picking.      |
-| `--version-id <id>` | Run one [version](/docs/script-versions) instead of the current one.   |
+| `--device <id>`     | Run on one named [device](/docs/core-concepts#browser) instead of auto-picking.      |
+| `--version-id <id>` | Run one [version](/docs/core-concepts#scripts) instead of the current one.   |
 | `--out <dir>`       | Where downloaded files land (default `~/Downloads`).                   |
 | `--sequential`      | Chain the scripts through one browser instead of running them at once. |
 

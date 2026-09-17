@@ -24,7 +24,7 @@ By exposing deterministic scripts as tools with a clear contract of inputs and o
 
     :::details More about pairing
     Right after the install, the extension asks to pair with your Reduck account: click
-    **Authorise**. A paired browser is a [device](/docs/devices), and scripts run in it act as
+    **Authorise**. A paired browser is a [device](/docs/core-concepts#browser), and scripts run in it act as
     you — they inherit the sites you are already signed into, and no password ever reaches
     Reduck.
 

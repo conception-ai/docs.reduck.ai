@@ -17,8 +17,8 @@ The usual path is three tools deep: **find** a script, **read** its contract, **
 | ------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | `list_scripts`     | Search the scripts you can run: your own, your projects', and the official catalogue.                             |
 | `read_script`      | One script's contract — arguments, output, whether it needs a login, whether it changes anything.                 |
-| `run_script`       | Run it, on a [device](/docs/devices) or a [managed browser](/docs/core-concepts#browser). One script, or up to twenty at once. |
-| `list_runs`        | Your [runs](/docs/runs), newest first.                                                                            |
+| `run_script`       | Run it, on a [device](/docs/core-concepts#browser) or a [managed browser](/docs/core-concepts#browser). One script, or up to twenty at once. |
+| `list_runs`        | Your [runs](/docs/core-concepts#parallel-runs), newest first.                                                                            |
 | `read_run_results` | What a run returned, by run id or batch id.                                                                       |
 | `read_run_trace`   | The steps and screenshots behind a run.                                                                           |
 
@@ -26,7 +26,7 @@ The usual path is three tools deep: **find** a script, **read** its contract, **
 
 | Tool           | What it does                                                                                    |
 | -------------- | ----------------------------------------------------------------------------------------------- |
-| `whoami`       | Which account the agent is signed in as, its projects, and this period's [usage](/docs/quotas). |
+| `whoami`       | Which account the agent is signed in as, its projects, and this period's [usage](https://reduck.ai/pricing). |
 | `list_devices` | The browsers paired to the account, and their ids.                                              |
 | `read_docs`    | Reduck's own documentation, including the script-writing reference.                             |
 
@@ -44,10 +44,10 @@ covers what it does with them.
 | `patch_draft_script_version`                                  | Edit that draft in place.                                                             |
 | `promote_script_version`                                      | Make a draft the current version.                                                     |
 | `delete_draft_script_version`                                 | Discard a draft.                                                                      |
-| `list_script_versions`                                        | The line of [versions](/docs/script-versions), newest first.                          |
+| `list_script_versions`                                        | The line of [versions](/docs/core-concepts#scripts), newest first.                          |
 | `update_script_metadata`                                      | Name, description, visibility.                                                        |
 | `archive_script` / `unarchive_script`                         | Take a script out of listings without deleting it, and put it back.                   |
-| `read_host_readme` / `set_host_readme` / `delete_host_readme` | The notes shared by every script on one site. See [Host READMEs](/docs/host-readmes). |
+| `read_host_readme` / `set_host_readme` / `delete_host_readme` | The notes shared by every script on one site. |
 
 > `run_script` opens its own browser, so a plain run needs no session. `start_session` is for
 > `exec_code` — it is how an agent explores a site it is about to write a script for.

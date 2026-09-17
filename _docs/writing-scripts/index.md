@@ -25,7 +25,7 @@ loads the same text through `read_docs`.
 3. **Save.** `create_script` stores the body together with the input and output JSON Schemas — the
    contract callers get.
 4. **Test.** It runs the saved script for real and compares the result against the trace.
-5. **Iterate.** Fixes go into a [draft version](/docs/script-versions), tested by id, promoted when
+5. **Iterate.** Fixes go into a [draft version](/docs/core-concepts#scripts), tested by id, promoted when
    they hold.
 
 ## What makes a good script
@@ -53,10 +53,10 @@ its own actions, the fix belongs where it started, not in a retry.
 
 ## What you can do
 
-- **Ask for the trace, not the result**, when something looks off. [The trace](/docs/runs) shows the
+- **Ask for the trace, not the result**, when something looks off. [The trace](/docs/core-concepts#parallel-runs) shows the
   steps and the screenshots behind the number that surprised you.
 - **Write down what the site does to you** — a rate limit, a login that expires, a page that lies to
-  signed-out visitors — as a [host README](/docs/host-readmes). Every script on that site gets it,
+  signed-out visitors — as a host README. Every script on that site gets it,
   and so does the next agent that touches one.
 - **Run it twice, on different days.** A script passes in the session it was built in and fails on
   the second run more often than any other way. A second run in a clean browser is the real test.
