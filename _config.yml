@@ -40,6 +40,7 @@ sections:
 # stands on its own, so the content loses the nesting and not the pages.
 nested_under:
     connect: connect-your-agent
+    using-reduck: using-reduck
 
 markdown: kramdown
 
