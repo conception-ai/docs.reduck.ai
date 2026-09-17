@@ -93,18 +93,18 @@ module ReduckDocs
 			segments(body).each do |segment|
 				case segment[:kind]
 				when "text"
-					prose(slug, segment[:body], out)
+					prose(slug, segment[:body], out, allow_tabs: allow_tabs)
 				when "tabs"
 					unless allow_tabs
-						prose(slug, ":::tabs\n#{segment[:body]}\n:::", out)
+						prose(slug, ":::tabs\n#{segment[:body]}\n:::", out, allow_tabs: false)
 						next
 					end
 					tabs = tabs_of(slug, segment[:body], group)
-					tabs.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tabs", "id" => "tabs-#{group}", "tabs" => tabs }
+					tabs.empty? ? prose(slug, segment[:body], out, allow_tabs: allow_tabs) : out << { "kind" => "tabs", "id" => "tabs-#{group}", "tabs" => tabs }
 					group += 1
 				when "tiles"
 					tiles = tiles_of(slug, segment[:body])
-					tiles.empty? ? prose(slug, segment[:body], out) : out << { "kind" => "tiles", "tiles" => tiles }
+					tiles.empty? ? prose(slug, segment[:body], out, allow_tabs: allow_tabs) : out << { "kind" => "tiles", "tiles" => tiles }
 				when "details"
 					# Tiles and fences, but no tabs: folded prose is already one step aside from
 					# the page, and a choice inside it would be a second.
@@ -182,7 +182,7 @@ module ReduckDocs
 		# A run of markdown, cut at each fence, each callout and each run of steps. Each becomes a
 		# block of its own so it can wear the frame it needs — the copy button, the callout's
 		# colour, the joined dots of a numbered list.
-		def prose(slug, markdown, out)
+		def prose(slug, markdown, out, allow_tabs: true)
 			cursor = 0
 			markdown.to_enum(:scan, BLOCK).each do
 				match = Regexp.last_match
@@ -212,9 +212,11 @@ module ReduckDocs
 				if steps
 					# A step holds blocks the way a tab panel does: its first run of prose is the
 					# line beside the numeral, and whatever follows — a fence, a callout, a tiles
-					# group — is drawn under it, inside the step.
+					# group, a tabs group — is drawn under it, inside the step. Tabs are allowed
+					# where the step itself is: a step inside a tab panel gets none, as the panel
+					# gets none.
 					items = steps.split(STEP).drop(1).map do |item|
-						inner = blocks(slug, dedent(item), allow_tabs: false)
+						inner = blocks(slug, dedent(item), allow_tabs: allow_tabs)
 						lead = inner.first&.fetch("kind") == "html" ? inner.shift["html"] : ""
 						{ "html" => LONE_PARAGRAPH.match(lead)&.captures&.first || lead, "blocks" => inner }
 					end

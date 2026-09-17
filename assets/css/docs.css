@@ -791,11 +791,11 @@ ol.steps > li {
 
 /* A block under a step's lead line: set off from the line above it, and flush with the step's
    own bottom edge so the rail's spacing is the list's and not the block's. */
-.steps > li > :is(.code-block, .banner, .docs-tiles, .docs-prose, .docs-details, .stream) {
+.steps > li > :is(.code-block, .banner, .docs-tiles, .docs-tabs, .docs-prose, .docs-details, .stream) {
 	margin-top: 12px;
 }
 
-.steps > li > :is(.code-block, .banner, .docs-tiles, .docs-prose, .docs-details, .stream):last-child {
+.steps > li > :is(.code-block, .banner, .docs-tiles, .docs-tabs, .docs-prose, .docs-details, .stream):last-child {
 	margin-bottom: 0;
 }
 
