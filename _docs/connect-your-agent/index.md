@@ -29,24 +29,3 @@ Interactive terminal
 ::tile [Any other agent](/docs/other-clients)
 Streamable HTTP
 :::
-
-## What every client needs
-
-Whichever one you use, the same four facts apply.
-
-| Setting   | Value                                          |
-| --------- | ---------------------------------------------- |
-| URL       | `https://mcp.reduck.ai`                        |
-| Transport | Streamable HTTP — not stdio, not SSE           |
-| Scope     | User, so every project sees it                 |
-| Auth      | OAuth. The client opens a browser on first use |
-
-> [!NOTE]
-> A client that was running when you added the server does not pick it up. Restart it, then ask it
-> to list its tools — `discover_scripts` and `run_script` are the two that say Reduck is live.
-
-## Other ways in
-
-MCP is the way in most agents want, but not the only one. The [CLI](/docs/cli) runs scripts from a
-terminal and writes each result to disk, and the [REST API](/docs/api-reference) calls them over
-HTTP with nothing to install.

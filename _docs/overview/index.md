@@ -85,3 +85,14 @@ If our Official Script Library does not contain the exact scripts you want (e.g.
 ```
 
 - Once done your scripts can be discovered by your agent with Reduck MCP and can be found at [https://reduck.ai/projects/](https://reduck.ai/projects/)
+
+## Integrations
+
+Every script can be reached three ways. They run the same scripts on the same browsers; what
+differs is who is calling.
+
+| You want                                             | Use                             |
+| ---------------------------------------------------- | ------------------------------- |
+| An agent that finds and runs scripts for you         | [MCP](/docs/connect-your-agent) |
+| Scripts in a terminal, in parallel, or piped onward  | [CLI](/docs/cli)                |
+| Calls from your own code, a cron, or an orchestrator | [REST API](/docs/api-reference) |
