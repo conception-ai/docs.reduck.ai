@@ -40,7 +40,23 @@ By exposing deterministic scripts as tools with a clear contract of inputs and o
 
 3. Install Reduck MCP. Follow the right install step depending on your client:
 
+    :::tabs
+    ::tab Claude Code
+
+    ```bash
+    claude mcp add reduck --transport http --scope user https://mcp.reduck.ai
+    ```
+
+    ::tab Codex
+
+    ```bash
+    codex mcp add reduck --url https://mcp.reduck.ai
+    ```
+
+    ::tab Other clients
+
     ::tiles-from connect-your-agent
+    :::
 
 4. Start a new session and get started with your first automation! You can try a prompt like:
 
