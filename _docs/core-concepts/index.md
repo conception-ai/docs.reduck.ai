@@ -69,3 +69,13 @@ When to use which:
 | Credentials  | Never leave your browser        | Script signs itself in, or a connector         |
 | Availability | Needs your browser open         | 24/7                                           |
 | Network      | Your connection                 | Datacenter, or a residential proxy per country |
+
+## Runs
+
+One execution of one script on one browser is a **run**. It gets an id, and that id is how you
+read back the result, the error, or the step-by-step trace with screenshots.
+
+Pass a list of scripts instead of one and they run **at the same time, a browser each**, up to 20
+in a single call. One failing does not stop the others, and you get one outcome per script.
+[Runs, batches and traces](/docs/runs) covers reading them back and chaining scripts through one
+browser.
