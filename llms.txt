@@ -1,0 +1,25 @@
+---
+layout: null
+sitemap: false
+---
+{%- comment -%}
+  llmstxt.org: an H1, a blockquote summary, then H2 sections of `- [name](url): note`. The sections
+  and their order are the nav panel's (`_config.yml` `sections`), and each link is the page's
+  markdown twin, so a client following this file reads documents and never the shell around them.
+{%- endcomment -%}
+# {{ site.title }}
+
+> {{ site.description | strip_newlines | strip }}
+
+The product itself is at {{ site.app_url }}, and its own index at {{ site.app_url }}/llms.txt.
+{%- assign docs = site.docs | where_exp: "doc", "doc.draft != true" | sort: "order" -%}
+{%- for section in site.sections %}
+{%- assign pages = docs | where: "section", section.id %}
+{%- if pages.size > 0 %}
+
+## {{ section.label }}
+{% for doc in pages %}
+- [{{ doc.title }}]({{ doc.url | append: "index.md" | absolute_url }}): {{ doc.description | strip_newlines | strip }}
+{%- endfor %}
+{%- endif %}
+{%- endfor %}

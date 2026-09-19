@@ -13,6 +13,13 @@
 <meta content="{{ page_desc | strip_newlines }}" name="description" />
 <link href="{{ page.url | absolute_url }}" rel="canonical" />
 {%- comment -%}
+  Every docs page is also written as markdown beside its HTML (`_plugins/reduck_docs.rb`
+  `markdown_page`). Naming it here is how a client that reads documents rather than pages finds it.
+{%- endcomment -%}
+{%- if page.collection == "docs" %}
+<link href="{{ page.url | append: 'index.md' | absolute_url }}" rel="alternate" type="text/markdown" />
+{%- endif %}
+{%- comment -%}
   The staged build describes a release that is not out. Its pages answer on the public domain, so
   the tag is what keeps a reader searching for an answer from landing on one they cannot use;
   `robots.txt` at the root of the domain says the same to a crawler that asks first.
