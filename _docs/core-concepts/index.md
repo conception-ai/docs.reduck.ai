@@ -22,6 +22,13 @@ Reduck offers two visibility levels for scripts:
 A script is a line of **versions**. A draft is edited and tested, then promoted, and a promoted
 version never changes, so an argument that worked last week works today.
 
+### Handles
+
+Every script belongs to an owner identified by a **handle**. When your agent calls `list_scripts`,
+passing a handle scopes the results to that owner's public scripts. Optional owner scope: `@user`
+(with `@`) for a user, or a project handle (without `@`) — e.g. `reduck` for the official
+catalogue. Omit for a cross-owner search.
+
 ### Official scripts library
 
 ![The official library at reduck.ai/explore](official-library.png)
@@ -29,12 +36,13 @@ version never changes, so an argument that worked last week works today.
 Reduck's team maintains an official library of scripts on the most common websites (LinkedIn,
 Airbnb, Instagram, etc.) that you can find at [reduck.ai/explore](https://reduck.ai/explore).
 
-Your agent will know naturally how to discover and use these scripts through the MCP.
+Your agent discovers them by calling `list_scripts` with the handle `"reduck"`.
 
 ### Projects
 
 You can create your own custom scripts that end up in a **project**: a private workspace for
 scripts you build yourself, as opposed to the official scripts library maintained by Reduck's team.
+A project is also a [handle](#handles) — pass it to `list_scripts` to see that project's scripts.
 
 Projects let you automate flows specific to your own stack that you want to share with your team
 without exposing them to the broader Reduck community.
