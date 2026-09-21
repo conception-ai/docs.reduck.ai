@@ -7,7 +7,7 @@ order: 30
 
 Some scripts can upload a file, such as sending an email with attachment, uploading a CV for a job form, or an invoice for a portal.
 
-Uploading files with scripts has different modus operandi, whether we run the script from MCP, the CLI or the REST API.
+Uploading files with scripts has different modus operandi, whether we run the script from MCP, the [CLI](/docs/cli) or the [REST API](/docs/api-reference).
 
 We will see how it works with an example with the [`reduck/mail.google.com/send_email`](https://reduck.ai/explore/scripts/reduck/mail.google.com/send_email), from the official library.
 
