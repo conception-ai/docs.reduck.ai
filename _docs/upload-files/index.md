@@ -60,8 +60,7 @@ file that is already on your machine, and your Chrome reads it from your disk.
             "handle": "reduck",
             "args": {
                 "to": "me@example.com",
-                "subject": "Our new banner",
-                "attachmentName": "one-integration-every-website.png"
+                "subject": "Our new banner"
             },
             "files": {
                 "attachment": { "relativePath": "one-integration-every-website.png" }
@@ -70,7 +69,8 @@ file that is already on your machine, and your Chrome reads it from your disk.
     }
     ```
 
-    A file in a sub-folder is named with its path: `2026/invoice.pdf`.
+    The file keeps its own name, so the email arrives with `one-integration-every-website.png`
+    attached. A file in a sub-folder is named with its path: `2026/invoice.pdf`.
 
 > [!TIP]
 > The agent can only name files inside `~/Desktop/reduck`. An absolute path or a name with `..` is
@@ -90,8 +90,9 @@ npx @reduck-ai/cli@latest run \
     file:attachment=~/Downloads/one-integration-every-website.png
 ```
 
-`file:attachment=<path>` binds the file input named `attachment` to a file on your disk. The result
-comes back as JSON:
+`file:attachment=<path>` binds the file input named `attachment` to a file on your disk. Bytes carry
+no file name, so `attachmentName` gives the name the recipient sees. Without it, the file arrives
+named `attachment`. The result comes back as JSON:
 
 ```json
 {
@@ -157,9 +158,10 @@ Two rules to know:
 - **A file input is optional unless `required` lists it.** Listed, a run with no file stops with
   `missing file input "attachment"`. Not listed, the script checks `files.attachment` before it
   calls `uploadFile`, so one script serves the caller with a file and the caller without one.
-- **The file arrives under the input's name, not its own.** The page sees a file named `attachment`.
-  If the site shows the file name, as Gmail does, take the real name as an ordinary argument and
-  rename the file in the page. That is what `attachmentName` does in the example.
+- **Bytes arrive under the input's name.** A file named by `relativePath` keeps its own name, but
+  bytes from the CLI reach the page as a file named `attachment`. If the site shows the file name,
+  as Gmail does, take the real name as an ordinary argument and rename the file in the page. That
+  is what `attachmentName` does in the example.
 
 ## When it does not work
 
