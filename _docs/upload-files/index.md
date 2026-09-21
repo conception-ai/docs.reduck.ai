@@ -149,27 +149,6 @@ run goes to a managed browser, which needs a [connector](/docs/core-concepts#bro
 > `"files": {"attachment": {"b64": "…", "mime": "text/plain"}}`. For anything bigger, use
 > multipart.
 
-## Check the result
-
-A run that attaches a file ends like any other run. To confirm the file arrived, read the message
-back:
-
-```markdown
-Using Reduck MCP, find the email with the subject "Our new banner" and list its attachments.
-```
-
-```json
-{
-    "subject": "Our new banner",
-    "messages": [
-        {
-            "to": ["me@example.com"],
-            "attachments": ["one-integration-every-website.png"]
-        }
-    ]
-}
-```
-
 ## Write a script that takes a file
 
 A file input is a string property marked `format: "file"` in the script's input schema. Its key is
