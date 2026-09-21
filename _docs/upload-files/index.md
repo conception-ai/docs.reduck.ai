@@ -7,7 +7,7 @@ order: 30
 
 Some scripts can upload a file, such as sending an email with attachment, uploading a CV for a job form, or an invoice for a portal.
 
-Uploading files with scripts has different modus operandi, whether we run the script from MCP or CLI.
+Uploading files with scripts has different modus operandi, whether we run the script from MCP, the CLI or the REST API.
 
 We will see how it works with an example with the [`reduck/mail.google.com/send_email`](https://reduck.ai/explore/scripts/reduck/mail.google.com/send_email), from the official library.
 
@@ -62,7 +62,7 @@ file that is already on your machine, and your Chrome reads it from your disk.
     The file keeps its own name, so the email arrives with `one-integration-every-website.png`
     attached. A file in a sub-folder is named with its path: `2026/invoice.pdf`.
 
-> [!TIP]
+> [!NOTE]
 > The agent can only name files inside `~/Desktop/reduck`. An absolute path or a name with `..` is
 > rejected, so no other file on your machine can be attached, even by a prompt you did not write.
 
@@ -95,8 +95,59 @@ named `attachment`. The result comes back as JSON:
 }
 ```
 
-This is also the only way that works on a [managed browser](/docs/core-concepts#browser), because a
-managed browser cannot see your disk.
+Sending the bytes, from the CLI or the REST API, is the only way that works on a
+[managed browser](/docs/core-concepts#browser), because a managed browser cannot see your disk.
+
+## From the REST API
+
+`POST /run` takes a file in two ways. Both call the same script as above.
+
+**Send the bytes.** Send the request as `multipart/form-data`: the usual JSON body goes in a `spec`
+field, and the file goes in a part named `<step>:<file input>`. For a single `script`, the step is
+`0`. A file can be up to 50 MB.
+
+```bash
+curl -X POST https://mcp.reduck.ai/run \
+  -H "X-API-Key: $REDUCK_API_KEY" \
+  -F 'spec={"browser":"extension","script":{"host":"mail.google.com","slug":"send_email","handle":"reduck","args":{"to":"me@example.com","subject":"Our new banner","attachmentName":"one-integration-every-website.png"}}}' \
+  -F '0:attachment=@one-integration-every-website.png'
+```
+
+As with the CLI, bytes carry no file name, so pass `attachmentName`.
+
+**Name a file on your machine.** Send JSON, with the file in `files`, as the agent does. This works
+only on your own Chrome, with file access turned on (see [From your agent](#from-your-agent-mcp)).
+
+```bash
+curl -X POST https://mcp.reduck.ai/run \
+  -H "X-API-Key: $REDUCK_API_KEY" \
+  -H "content-type: application/json" \
+  -d '{"browser":"extension","script":{"host":"mail.google.com","slug":"send_email","handle":"reduck","args":{"to":"me@example.com","subject":"Our new banner"},"files":{"attachment":{"relativePath":"one-integration-every-website.png"}}}}'
+```
+
+Both answer with the script's result and a `runId`:
+
+```json
+{
+    "result": {
+        "sent": true,
+        "to": ["me@example.com"],
+        "cc": [],
+        "bcc": [],
+        "subject": "Our new banner",
+        "attachment": "one-integration-every-website.png"
+    },
+    "runId": "86b0479f-a68f-4fcd-92d1-b68f485ee3d9"
+}
+```
+
+`browser: "extension"` runs on your own Chrome, where you are signed in to Gmail. Without it, the
+run goes to a managed browser, which needs a [connector](/docs/core-concepts#browser) for Gmail.
+
+> [!NOTE]
+> The JSON body is limited to 100 KB, so you can also put a very small file inline as base64:
+> `"files": {"attachment": {"b64": "…", "mime": "text/plain"}}`. For anything bigger, use
+> multipart.
 
 ## Check the result
 
@@ -168,6 +219,8 @@ Each failure stops the run before anything is sent, and says what to fix.
   the CLI, which sends the bytes.
 - `unknown file input` or `missing file input`: the names you gave do not match the script's file
   inputs. Read the script's inputs and use the same names.
+- `Payload Too Large` (HTTP 413) from the REST API: a base64 file made the JSON body bigger than
+  100 KB. Send the file with multipart instead.
 
 > [!NOTE]
 > Turning on **Allow access to file URLs** restarts the extension. Your device can be missing from
