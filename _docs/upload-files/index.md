@@ -40,7 +40,10 @@ file that is already on your machine, and your Chrome reads it from your disk.
     to me@example.com by Gmail, with the subject "Our new banner".
     ```
 
-    The agent makes one `run_script` call. The file is named relative to the `reduck` folder:
+    The agent makes one `run_script` call. The `handle` identifies the script's owner —
+    `@user` (with `@`) for a user, or a project handle (without `@`) like `reduck` for the
+    official catalogue (see [handles](/docs/core-concepts#handles)). The file is named relative
+    to the `reduck` folder:
 
     ```json
     {

@@ -63,7 +63,7 @@ By exposing deterministic scripts as tools with a clear contract of inputs and o
 
 Reduck MCP possesses a unique blend of features that make it a first class tool for your Agent to automate complex web tasks:
 
-- **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain
+- **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain — your agent finds them by calling `list_scripts` with the handle `"reduck"`
 - **[Stealthy and private extension](/docs/core-concepts#browser)**: Reduck leverages your browser logged in state, fingerprints and residential IP so detection risk is minimal and credentials never leave your machine
 - **[Parallel runs](/docs/core-concepts#parallel-runs)**: scripts can be run in parallel with a single tool call for fast iterations
 
