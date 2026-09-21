@@ -26,6 +26,12 @@ Custom connector
 Streamable HTTP required
 ::tile [Hermes](/docs/hermes) icon:hermesagent
 Interactive terminal
+::tile [Gemini CLI](/docs/gemini-cli)
+One command
+::tile [Cursor](/docs/cursor)
+Config file
+::tile [n8n](/docs/n8n)
+MCP Client Tool node
 ::tile [Any other agent](/docs/other-clients)
 Streamable HTTP
 :::
