@@ -5,23 +5,11 @@ section: get-started
 order: 30
 ---
 
-Some scripts need a file: an attachment for an email, a CV for a job form, an invoice for a portal.
-Such a script declares a **file input**, and you give it a file when you run it.
+Some scripts can upload a file, such as sending an email with attachment, uploading a CV for a job form, or an invoice for a portal.
 
-There are two ways to give the file. The script is the same for both.
+Uploading files with scripts has different modus operandi, whether we run the script from MCP or CLI.
 
-- **Name the file**, from an agent through MCP. The file must be in `~/Desktop/reduck`, and the run
-  must be on your own Chrome.
-- **Send the bytes**, from the CLI. The file can be anywhere on your machine, and the run can be on
-  your Chrome or on a managed browser.
-
-The example on this page sends an image by Gmail.
-
-> [!TIP]
-> The script is
-> [`reduck/mail.google.com/send_email`](https://reduck.ai/explore/scripts/reduck/mail.google.com/send_email),
-> from the official library. Its file input is named `attachment`, and it is optional: the same
-> script sends an email with no attachment when you give it no file.
+We will see how it works with an example with the [`reduck/mail.google.com/send_email`](https://reduck.ai/explore/scripts/reduck/mail.google.com/send_email), from the official library.
 
 ## From your agent (MCP)
 
@@ -32,6 +20,8 @@ file that is already on your machine, and your Chrome reads it from your disk.
 
     Open `chrome://extensions`, click **Details** on Reduck, and turn on
     **Allow access to file URLs**.
+
+    ::video 658e7c6d24ba2f18926b164ebbf135f0 Turn on Allow access to file URLs for the Reduck extension
 
     > [!NOTE]
     > On macOS, Chrome may also ask for access to your Desktop folder. Allow it.
