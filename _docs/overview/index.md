@@ -76,7 +76,7 @@ If our Official Script Library does not contain the exact scripts you want (e.g.
 - Provide a prompt to tell your Agent to build a new script, such as:
 
 ```markdown
-"Use Reduck MCP to create scripts for trends.google.com keywords"
+"Use Reduck MCP to create a script that pulls IMDb's US box office top 10 for the weekend, with each film's IMDb rating, vote count, genre and Metascore"
 ```
 
 - Once done your scripts can be discovered by your agent with Reduck MCP and can be found at [https://reduck.ai/projects/](https://reduck.ai/projects/)
