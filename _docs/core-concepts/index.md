@@ -60,7 +60,7 @@ Reduck runs automation scripts using two main modes:
   the Reduck extension. The automation automatically inherits your browser state, e.g. which site
   you are logged in, browser fingerprints for stealth, etc. but **requires your browser to be
   open**. Each browser you pair is a **device** with its own id: pair several, and a run can name
-  which one.
+  which one. See [Supported browsers](/docs/supported-browsers) for each browser's setup.
 - **Managed browser**. Browser automation happens on Reduck managed Cloud so that you can run
   automations 24/7 without having to have your browser accessible and can scale better than your
   machine. Managed browser is subject to a different pricing (more expensive) than BYOB (see our
