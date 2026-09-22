@@ -14,7 +14,7 @@ and every Chromium browser works the same way with the same extension and the sa
 | --- | --- | --- |
 | Chrome | Supported | [Quick start](/docs/overview#quick-start) |
 | Edge | Supported, verified | Same as Chrome |
-| Brave | Supported, verified | Same as Chrome |
+| Brave | Supported, verified | Same as Chrome, plus [one setting](#brave) |
 | Arc | Supported, verified | Same as Chrome, with [two quirks](#arc) |
 | Other Chromium browsers | Expected to work | Same as Chrome |
 | Firefox | **Not supported** | [Why](#firefox-and-safari) |
@@ -26,19 +26,39 @@ Reduck needs **Chromium 138 or later**. Any current release of the browsers abov
 
 Install the extension, pair the browser, done. The rest of this page is only for the other cases.
 
-## Edge, Brave and other Chromium browsers
+## Edge and other Chromium browsers
 
 Nothing is different. The extension installs from the Chrome Web Store, pairs the same way, and
 each browser becomes its own device. There are no browser-specific flags, policies or settings to
 change.
 
 Edge asks once for permission to install extensions from a store other than its own. Allow it, and
-the Chrome Web Store listing installs normally.
+the Chrome Web Store listing installs normally. Brave is the one exception to "nothing is
+different": see below.
 
 > [!NOTE]
 > Each browser you pair is a separate device with its own cookies and its own sessions. Being
 > signed in to a site in Chrome does not sign you in on the Edge device. Pick the device that
 > holds the session the script needs, or leave `deviceId` out and let Reduck choose.
+
+## Brave
+
+One setting, before you pair. Brave blocks Google's push messaging service by default, and push is
+how the server wakes your browser when an agent asks for a run. Without it the extension installs,
+pairs, and reports **Session Active** — while every run waits for a browser that is never told to
+start.
+
+1. Open `brave://settings/privacy`.
+2. Turn on **Use Google services for push messaging**.
+3. Restart Brave.
+4. Open the Reduck side panel and pair the browser.
+
+> [!WARNING]
+> Nothing surfaces as an error when the setting is off. A paired Brave that answers no run at all,
+> with a side panel that looks healthy, is this and almost nothing else.
+
+Already paired with the setting off? Turn it on, reset the device from the side panel, and pair
+again, so the browser registers a push subscription that works.
 
 ## Arc
 
