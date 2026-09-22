@@ -403,6 +403,17 @@
 	color: var(--color-orange-400);
 }
 
+/* A .btn dropped into prose is a button, not a link: it keeps the button's own ink, and the
+   prose underline would draw a line through it. */
+.docs-prose a.btn {
+	text-decoration: none;
+}
+
+.docs-prose a.btn-primary,
+.docs-prose a.btn-primary:hover {
+	color: var(--color-grey-900);
+}
+
 .docs-prose strong {
 	color: var(--color-grey-50);
 	font-weight: 600;
