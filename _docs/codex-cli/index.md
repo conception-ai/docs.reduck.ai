@@ -51,6 +51,17 @@ This applies to Reduck alone; every other server keeps asking.
 To lift approvals for one session instead, start Codex with `codex --full-auto` — sandbox
 `workspace-write`, approval `on-failure`. That choice lasts only as long as the session.
 
+## Run your first script
+
+Connecting the agent is not the last step of setup — a run is. Ask your agent to do something on a
+website, and it searches the official library, picks the scripts it needs, and runs them for you.
+
+```text
+Use Reduck to fetch the latest X.com reposts by Reduck AI
+```
+
+Once it runs, finish setup at [reduck.ai/setup](https://reduck.ai/setup).
+
 ## If it does not appear
 
 - The account is on the free tier. Codex Pro is required for MCP servers.
