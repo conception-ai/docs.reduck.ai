@@ -22,7 +22,7 @@ By exposing deterministic scripts as tools with a clear contract of inputs and o
 ## Quick start
 
 1. Create an account at [reduck.ai](https://reduck.ai/#signin).
-2. Install the [Reduck extension](https://chromewebstore.google.com/detail/reduck/koccidjchcojlmgkdhibpgjbnhcoopio) and pair it with your account.
+2. Install the [Reduck extension](https://chromewebstore.google.com/detail/reduck/koccidjchcojlmgkdhibpgjbnhcoopio) and pair it with your account. Not using Chrome? See [Supported browsers](/docs/supported-browsers).
 
     :::details More about pairing
     Right after the install, the extension asks to pair with your Reduck account: click
