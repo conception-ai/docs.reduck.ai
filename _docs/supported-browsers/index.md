@@ -10,8 +10,8 @@ Chrome, just [install the extension](https://reduck.ai/setup/install-extension?r
 The other Chromium browsers each have one detail of their own below. If you would rather not keep
 a browser open at all, you want the [managed browser](/docs/core-concepts#browser) instead.
 
-Reduck needs **Chromium 138 or later**, which any current release clears. Firefox and Safari are
-[not supported](#firefox-and-safari).
+Reduck needs **Chromium 138 or later**, which any current release clears. [Firefox](#firefox),
+[Safari](#safari) and [Opera](#opera) are not supported.
 
 <a class="btn medium btn-primary" href="https://reduck.ai/setup/install-extension?redirect_to=%2Fprojects">Install the Reduck extension</a>
 
@@ -53,8 +53,12 @@ Arc also reports itself as plain Chromium, so it is listed as **Chromium**, not 
 pair several Chromium browsers, that is the one detail that will make you run a script on the
 wrong one.
 
-## Firefox and Safari
+## <span id="firefox-and-safari"></span><span id="firefox"></span><span id="safari"></span><span id="opera"></span>Firefox, Safari and Opera
 
-Not supported, and not a setup problem you can work around. Both rely on extension APIs that
-Chromium has and they do not, so supporting them takes more than porting the extension. It is on
-the roadmap, but not planned in the short term.
+Not supported, and not a setup problem you can work around.
+
+Firefox and Safari rely on extension APIs that Chromium has and they do not, so supporting them
+takes more than porting the extension. It is on the roadmap, but not planned in the short term.
+
+Opera is Chromium-based, but it is not one of the browsers we support or test today. The extension
+is not validated there, so pairing it is not something we can back yet.
