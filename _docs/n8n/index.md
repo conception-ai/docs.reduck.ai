@@ -5,22 +5,23 @@ section: connect
 order: 100
 ---
 
-n8n reaches Reduck through its built-in **MCP Client Tool** node, attached to an AI Agent. The
-agent then has the Reduck tools alongside everything else in the workflow.
+n8n connects to Reduck with its built-in **MCP Client Tool** node. Attach that node to an AI
+Agent, and the agent can use the Reduck tools alongside everything else in the workflow.
 
 ## Before you start
 
-You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
+You need a Reduck account, and a paired browser if you want scripts to run in your own Chrome.
 Both are in the [quick start](/docs/overview#quick-start).
 
-You also need an [API key](/docs/api-reference) from your Reduck dashboard. n8n runs on a server
-with no browser to complete a sign-in flow, so the key is how a workflow authenticates.
+You also need an [API key](/docs/api-reference) from your Reduck dashboard. n8n usually runs on a
+server with no browser to sign in with, so the key is what identifies you instead.
 
 ## Add the node
 
 1. Add an **AI Agent** node to your workflow.
 2. On its **Tool** connector, add an **MCP Client Tool** node.
-![An AI Agent node with the Reduck MCP Client Tool attached to its Tool connector](agent-with-mcp-tool.png)
+
+   ![An AI Agent node with the Reduck MCP Client Tool attached to its Tool connector](agent-with-mcp-tool.png)
 
 3. Fill it in:
 
@@ -32,51 +33,51 @@ with no browser to complete a sign-in flow, so the key is how a workflow authent
 | Credential → Name | `X-API-Key` |
 | Credential → Value | your Reduck API key |
 
-**Server Transport** defaults to HTTP Streamable, which is what Reduck speaks. The other option,
-Server Sent Events, is deprecated and will not connect.
+Leave **Server Transport** on HTTP Streamable — that is what Reduck uses. The other choice, Server
+Sent Events, is out of date and will not connect.
 
-## Raise the timeout
+## Give it more time
 
-Under **Options → Timeout**, set something generous. **60000 ms is the node's default and it is
-too low for Reduck**: `run_script` blocks while a real browser loads a real page, and a cold
-device plus a slow site will cross a minute without anything being wrong.
+Open **Options → Timeout** and raise it. **The node waits one minute by default, which is not
+enough for Reduck.** Running a script opens a real browser and loads a real page, and on a slow
+site that easily takes longer than a minute even when everything is working.
 
-Start at `300000` (five minutes) and lower it only if you know your scripts are fast.
+Start with `300000` (five minutes), and lower it later if you know your scripts are quick.
 
-This is the single most common reason a Reduck node fails in n8n while the same script succeeds
-everywhere else.
+This is the most common reason a Reduck node fails in n8n while the same script works everywhere
+else.
 
-## Narrow the tool list
+## Show the agent fewer tools
 
-Reduck exposes 30 tools, and most of them are for authoring scripts rather than running them. An
-agent that only has to run the catalogue does better with fewer:
+Reduck comes with 30 tools, and most of them are for building scripts rather than running them. An
+agent that only needs to run existing scripts does better with a short list.
 
 Set **Include Tools** to *Selected* and pick:
 
 - `list_scripts` — find a script for the site
-- `read_script` — read its arguments before calling it
+- `read_script` — see what information it needs
 - `run_script` — run it
 
-Add `list_devices` if the workflow picks a browser explicitly, and `list_runs` or
-`read_run_results` if it needs to inspect a run afterwards.
+Add `list_devices` if the workflow chooses a browser itself, and `list_runs` or
+`read_run_results` if it needs to look at a run afterwards.
 
-## Confirm it is connected
+## Check that it worked
 
-Open the MCP Client Tool node. Once the credential is accepted, the node lists the tools it found
-on the server — that list is the proof. Then run the workflow once and ask the agent to call
-`whoami`; it reports the Reduck account the key belongs to.
+Open the MCP Client Tool node. Once the key is accepted, the node lists the tools it found. Then
+run the workflow once and ask the agent to run `whoami` — it tells you which Reduck account the
+key belongs to.
 
-## If it does not appear
+## If Reduck does not show up
 
-- **The transport is set to Server Sent Events.** It is deprecated and Reduck does not serve it.
-  Switch to HTTP Streamable.
-- **The header name is wrong.** It is `X-API-Key`, and Header Auth sends exactly what you type.
-  Bearer Auth also works, with a token rather than an API key.
-- **The node timed out.** See above — the default minute is not enough for a browser run.
-- **The key is not valid.** An unrecognized key comes back as a `401`, which n8n surfaces as a
-  failed connection rather than as an authentication message.
+- **The transport is set to Server Sent Events.** Reduck does not support it. Switch to HTTP
+  Streamable.
+- **The header name is wrong.** It has to be `X-API-Key`, spelled exactly that way. Bearer Auth
+  works too, using a token instead of an API key.
+- **The node ran out of time.** See above — one minute is not enough for a browser run.
+- **The key is not valid.** n8n shows this as a failed connection rather than saying the key was
+  refused, so check the key before anything else.
 
-## Going the other way
+## The other direction
 
-This page is about n8n driving Reduck. A Reduck script can also call *into* n8n — a workflow's
-`/webhook/<path>` is an ordinary URL, so a script reaches it with no session at all.
+This page covers n8n using Reduck. A Reduck script can also call n8n: a workflow's
+`/webhook/<path>` is an ordinary web address, so a script can reach it with no sign-in at all.

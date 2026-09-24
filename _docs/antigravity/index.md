@@ -1,16 +1,17 @@
 ---
 title: Google Antigravity
-description: Add Reduck to Google Antigravity as an MCP server, through its raw JSON config, and keep the connection authenticated.
+description: Add Reduck to Google Antigravity by editing its MCP config file, then keep the connection signed in.
 section: connect
 order: 110
 ---
 
-Antigravity connects to Reduck through a raw JSON config rather than a connector picker, so the
-setup is a few more clicks than Claude Desktop. The steps below walk through it end to end.
+Antigravity has no list of ready-made connectors, so you add Reduck by editing a small config
+file yourself. It takes a few more clicks than Claude Desktop. The steps below cover the whole
+thing.
 
 ## Before you start
 
-You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
+You need a Reduck account, and a paired browser if you want scripts to run in your own Chrome.
 Both are in the [quick start](/docs/overview#quick-start).
 
 ## Add the server
@@ -41,25 +42,27 @@ Add the following to the file:
 
 Save the file and return to **MCP Servers** to confirm `reduck` is listed.
 
-## Confirm it is connected
+## Check that it worked
 
-Open **MCP Servers** and check that `reduck` shows as authenticated. If it does not, click
-**Authenticate** and complete sign-in to your Reduck account in the browser tab that opens.
+Open **MCP Servers** and check that `reduck` is signed in. If it is not, click **Authenticate**
+and sign in to your Reduck account in the browser tab that opens.
 
 ![Antigravity showing an MCP authentication error](authentication-error.png)
 
 > [!WARNING]
-> **The connection drops often.** When it does, Antigravity falls back to running the request
-> through the standalone Gemini agent instead of Reduck — so a request can appear to succeed
-> without Reduck having run anything. Check that `reduck` is still authenticated before trusting a
-> result. Antigravity also disconnects whenever the network or your session is interrupted, and has
-> to be reconnected by hand from **MCP Servers → Authenticate**. Both are being worked on.
+> **The connection drops often, and it is easy to miss.** When it drops, Antigravity answers using
+> the normal Gemini agent instead of Reduck. You still get a reply, so the request looks like it
+> worked even though Reduck never ran. Before trusting a result, check that `reduck` is still
+> signed in under **MCP Servers**.
+>
+> The connection also drops whenever your internet or your session is interrupted, and it does not
+> come back on its own — sign in again from **MCP Servers → Authenticate**. Both problems are
+> being worked on.
 
-## If it does not appear
+## If Reduck does not show up
 
-- The config was not saved, or has a syntax error. Reopen **View raw config** and check the JSON is
-  valid.
-- The URL carries a path or a trailing segment. It is `https://mcp.reduck.ai/` and nothing more.
-- Sign-in never finished. Click **Authenticate** next to `reduck` and complete the browser flow
-  before running a tool.
-- The connection dropped after a network interruption. Re-authenticate from **MCP Servers**.
+- **The file was not saved, or the JSON has a typo.** Reopen **View raw config** and check it.
+- **The address has something extra after it.** It is `https://mcp.reduck.ai/` and nothing more.
+- **The sign-in was never finished.** Click **Authenticate** next to `reduck` and complete it in
+  the browser before using a tool.
+- **The connection dropped after your internet cut out.** Sign in again from **MCP Servers**.

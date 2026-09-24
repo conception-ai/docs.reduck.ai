@@ -1,21 +1,21 @@
 ---
 title: Cursor
-description: Add the Reduck MCP server to Cursor with a two-line config file, and authorize it from Customize.
+description: Add Reduck to Cursor with a short config file, then approve it once from Customize.
 section: connect
 order: 90
 ---
 
-Cursor reads MCP servers from a JSON file. There is no command to run: you write the file, then
-authorize from Customize.
+Cursor keeps its MCP servers in a JSON file. There is nothing to install: add the file, then
+approve Reduck once inside Cursor.
 
 ## Before you start
 
-You need a Reduck account, and a paired browser if you want scripts to run on your own Chrome.
+You need a Reduck account, and a paired browser if you want scripts to run in your own Chrome.
 Both are in the [quick start](/docs/overview#quick-start).
 
 ## Add the server
 
-Write `~/.cursor/mcp.json` to make Reduck available in every project:
+Put this in `~/.cursor/mcp.json` to use Reduck in every project:
 
 ```json
 {
@@ -27,41 +27,40 @@ Write `~/.cursor/mcp.json` to make Reduck available in every project:
 }
 ```
 
-For one project only, the same content goes in `.cursor/mcp.json` at the root of that project.
+To use it in one project only, put the same thing in `.cursor/mcp.json` in that project's folder.
 
-That is the whole entry. Cursor infers streamable HTTP from the `url` key, and Reduck needs no
-client id and no scopes in the file — it registers Cursor as an OAuth client on its own the first
-time they talk.
+That is the whole entry. You do not need a client ID, a secret, or a list of permissions — Reduck
+sets all that up itself the first time Cursor connects.
 
-## Authorize
+## Approve it
 
-Open **Customize** in Cursor's sidebar and filter to **MCPs**. Reduck is listed under
-**Needs Attention**, as *Needs authentication*. Click **Authenticate**, approve the request in the
-browser, and the tools register.
+Open **Customize** in Cursor's sidebar and choose **MCPs**. Reduck appears under **Needs
+Attention**, marked *Needs authentication*. Click **Authenticate** and approve it in the browser
+tab that opens.
 
 ![Reduck listed under Needs Attention, waiting to be authenticated](needs-authentication.png)
 
-Until you do, the server has an empty tool list — which looks like a broken config and is not
-one.
+Until you do, Reduck shows no tools. That looks like a broken setup, but it is not — it simply has
+not been approved yet.
 
 > [!NOTE]
 > Older versions of Cursor kept this under **Settings → MCP**. Plugins, MCPs, Skills and Rules
-> have since moved to **Customize**; Cursor shows a notice in Settings pointing there.
+> have moved to **Customize**, and Settings now points you there.
 
-## Confirm it is connected
+## Check that it worked
 
-Reduck moves to **Connected** and its entry reports the tool count once authorization completes.
+Reduck moves to **Connected** and shows how many tools it has.
 
 ![Reduck connected, with 30 tools enabled](connected.png)
 
-Then ask Cursor, in a chat, to call `whoami`. It reports the Reduck account and handle it is signed in as, which is the
-part worth checking: the OAuth flow signs you in as whichever Reduck account your browser is
-already using, not necessarily the one you meant.
+Then ask Cursor in a chat to run `whoami`. It tells you which Reduck account you are signed in as.
+That is worth checking, because signing in uses whichever Reduck account your browser is already
+logged into — if you have more than one, it may not be the one you meant.
 
-## Run without a browser
+## When there is no browser
 
-Cloud Agents and CI have no browser to complete OAuth in. Send an
-[API key](/docs/api-reference) as a header instead:
+Some setups have no browser to sign in with, such as Cloud Agents or a CI server. Use an
+[API key](/docs/api-reference) there instead:
 
 ```json
 {
@@ -76,15 +75,14 @@ Cloud Agents and CI have no browser to complete OAuth in. Send an
 }
 ```
 
-`${env:NAME}` is expanded from the environment, so the key does not sit in the file. Remote
-servers do not read Cursor's `envFile`, so set the variable in your shell profile.
+`${env:REDUCK_API_KEY}` reads the key from your environment, so the key itself never sits in the
+file. Set it in your shell profile: Cursor's `envFile` setting does not apply to servers like this
+one.
 
-## If it does not appear
+## If Reduck does not show up
 
-- **Cursor was not restarted** after the file changed.
-- **The entry has a `command` instead of a `url`.** That is the stdio shape, which expects a
-  process to launch. Reduck is a URL.
-- **Authorization expired.** Cursor keeps a refresh token, and a long-idle one stops being
-  accepted. The server then flips back to `needsAuth`, silently: authorize it again. If
-  you are reading Cursor's own logs, this shows up as a `400` on the token endpoint rather than
-  as anything mentioning Reduck.
+- **Cursor was not restarted** after you changed the file.
+- **The entry uses `command` instead of `url`.** `command` is for servers that run as a program on
+  your own machine. Reduck is a web address, so it needs `url`.
+- **The approval ran out.** If Cursor goes unused for a long time, the sign-in stops working and
+  Reduck quietly goes back to needing approval. Approve it again.
