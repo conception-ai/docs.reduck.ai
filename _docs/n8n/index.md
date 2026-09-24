@@ -20,6 +20,8 @@ with no browser to complete a sign-in flow, so the key is how a workflow authent
 
 1. Add an **AI Agent** node to your workflow.
 2. On its **Tool** connector, add an **MCP Client Tool** node.
+![An AI Agent node with the Reduck MCP Client Tool attached to its Tool connector](agent-with-mcp-tool.png)
+
 3. Fill it in:
 
 | Field | Value |
