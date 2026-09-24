@@ -1,6 +1,6 @@
 ---
 title: Codex Desktop
-description: Add Reduck to the Codex desktop app over streamable HTTP, and let scripts run without an approval prompt.
+description: Add Reduck to the Codex desktop app over streamable HTTP, sharing one config file with the command line, and skip the approval prompt.
 section: connect
 order: 40
 ---

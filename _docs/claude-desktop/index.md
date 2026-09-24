@@ -1,6 +1,6 @@
 ---
 title: Claude Desktop and web
-description: Add Reduck to Claude Desktop or claude.ai as a custom connector.
+description: Add Reduck to Claude Desktop or claude.ai as a custom connector. One connector follows your Claude account, so adding it once covers both.
 section: connect
 order: 20
 ---

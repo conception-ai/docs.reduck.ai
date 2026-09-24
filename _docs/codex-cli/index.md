@@ -1,6 +1,6 @@
 ---
 title: Codex CLI
-description: Add the Reduck MCP server to the Codex command line, and let scripts run without an approval prompt.
+description: Add the Reduck MCP server to the Codex command line, pin the Codex release Reduck is tested against, and let scripts run without an approval prompt.
 section: connect
 order: 30
 ---
