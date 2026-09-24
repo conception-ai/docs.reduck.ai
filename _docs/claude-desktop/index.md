@@ -34,6 +34,17 @@ Restart Claude Desktop. Claude on the web picks the connector up on the next pag
 Start a new chat and open the tools menu. Reduck is listed, and the first call opens a browser to
 sign in to your Reduck account.
 
+## Run your first script
+
+Connecting the agent is not the last step of setup — a run is. Ask your agent to do something on a
+website, and it searches the official library, picks the scripts it needs, and runs them for you.
+
+```text
+Use Reduck to fetch the latest X.com reposts by Reduck AI
+```
+
+Once it runs, finish setup at [reduck.ai/setup](https://reduck.ai/setup).
+
 ## If it does not appear
 
 - Claude Desktop was not restarted. A running app does not pick up a new connector.
