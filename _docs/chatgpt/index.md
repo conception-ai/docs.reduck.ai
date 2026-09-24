@@ -1,6 +1,6 @@
 ---
 title: ChatGPT
-description: Add Reduck to ChatGPT on the web as a custom connector.
+description: Add Reduck to ChatGPT on the web as a custom connector, so the agent can run browser scripts on the sites that have no API of their own.
 section: connect
 order: 50
 ---

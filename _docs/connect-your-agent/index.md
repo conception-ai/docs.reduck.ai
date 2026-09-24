@@ -1,6 +1,6 @@
 ---
 title: Connect your agent
-description: Add the Reduck MCP server to Claude Code, Claude Desktop, Codex, ChatGPT or any other MCP client.
+description: Add the Reduck MCP server to Claude Code, Claude Desktop, Codex, ChatGPT or any other MCP client. Nothing to install, and no package to run.
 section: get-started
 order: 25
 ---

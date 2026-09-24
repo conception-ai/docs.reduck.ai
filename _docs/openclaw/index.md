@@ -1,6 +1,6 @@
 ---
 title: OpenClaw
-description: Add the Reduck MCP server to OpenClaw over streamable HTTP, and keep its gateway alive.
+description: Add the Reduck MCP server to OpenClaw over streamable HTTP, keep its local gateway alive, and bring the model provider it ships without.
 section: connect
 order: 60
 ---

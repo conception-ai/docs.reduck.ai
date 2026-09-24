@@ -4,7 +4,7 @@
 {%- assign page_title = page.title | default: site.title -%}
 {%- assign page_desc = page.description | default: site.description -%}
 {%- if page.url == "/" -%}
-	{%- assign head_title = site.title -%}
+	{%- assign head_title = site.title | append: " · " | append: site.tagline -%}
 {%- else -%}
 	{%- assign head_title = page_title | append: " · " | append: site.title -%}
 {%- endif -%}
@@ -37,6 +37,7 @@
 <meta content="{{ page_desc | strip_newlines }}" property="og:description" />
 <meta content="{{ page.url | absolute_url }}" property="og:url" />
 <meta content="{{ site.title }}" property="og:site_name" />
+<meta content="{{ site.locale }}" property="og:locale" />
 <meta content="{% if page.image %}{{ page.image | absolute_url }}{% else %}{{ '/assets/img/og.png' | absolute_url }}{% endif %}" property="og:image" />
 {%- comment -%}
   A card without these is a card a client may lay out small, or not at all, while it decides what
@@ -48,6 +49,7 @@
 <meta content="Reduck docs: automate any site, straight from your agent" property="og:image:alt" />
 <meta content="{% if page.layout == 'post' %}article{% else %}website{% endif %}" property="og:type" />
 <meta content="summary_large_image" name="twitter:card" />
+<meta content="{{ site.x_handle }}" name="twitter:site" />
 
 <link href="{{ '/assets/favicon.ico' | relative_url }}" rel="icon" sizes="any" />
 

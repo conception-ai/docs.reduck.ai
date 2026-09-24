@@ -1,6 +1,6 @@
 ---
 title: Hermes
-description: Add the Reduck MCP server to Hermes, and point it at your own model provider.
+description: Add the Reduck MCP server to Hermes over OAuth, and point it at a model provider of your own, which Hermes needs and does not ship with.
 section: connect
 order: 70
 ---

@@ -1,6 +1,6 @@
 ---
 title: Claude Code
-description: Add the Reduck MCP server to Claude Code with one command.
+description: Add the Reduck MCP server to Claude Code with one command, scoped to the machine or to a single project, and confirm it with /mcp.
 section: connect
 order: 10
 ---
