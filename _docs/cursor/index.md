@@ -78,3 +78,12 @@ Some setups have no browser to sign in with, such as Cloud Agents or a CI server
 `${env:REDUCK_API_KEY}` reads the key from your environment, so the key itself never sits in the
 file. Set it in your shell profile: Cursor's `envFile` setting does not apply to servers like this
 one.
+
+## Try it
+
+Ask for something on a real site, and let the agent pick the script:
+
+> Get me the weather in Paris for the next two weeks.
+
+Reduck finds a script for the site, runs it, and hands back the result. The
+[script catalogue](/explore/scripts) lists everything it can already do.

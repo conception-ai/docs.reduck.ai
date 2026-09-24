@@ -66,3 +66,12 @@ Add `list_devices` if the workflow chooses a browser itself, and `list_runs` or
 Open the MCP Client Tool node. Once the key is accepted, the node lists the tools it found. Then
 run the workflow once and ask the agent to run `whoami` — it tells you which Reduck account the
 key belongs to.
+
+## Try it
+
+Ask for something on a real site, and let the agent pick the script:
+
+> Get me the weather in Paris for the next two weeks.
+
+Reduck finds a script for the site, runs it, and hands back the result. The
+[script catalogue](/explore/scripts) lists everything it can already do.

@@ -44,8 +44,12 @@ Save the file and return to **MCP Servers** to confirm `reduck` is listed.
 
 ## Check that it worked
 
-Open **MCP Servers** and check that `reduck` is signed in. If it is not, click **Authenticate**
-and sign in to your Reduck account in the browser tab that opens.
+Open **MCP Servers**. `reduck` is listed and signed in, and its tools are now available to the
+agent. Ask Antigravity to run `whoami` — it replies with the Reduck account you are signed in as,
+which confirms the connection end to end.
+
+If `reduck` is not signed in, click **Authenticate** and finish signing in to your Reduck account
+in the browser tab that opens.
 
 ![Antigravity showing an MCP authentication error](authentication-error.png)
 
@@ -58,3 +62,12 @@ and sign in to your Reduck account in the browser tab that opens.
 > The connection also drops whenever your internet or your session is interrupted, and it does not
 > come back on its own — sign in again from **MCP Servers → Authenticate**. Both problems are
 > being worked on.
+
+## Try it
+
+Ask for something on a real site, and let the agent pick the script:
+
+> Get me the weather in Paris for the next two weeks.
+
+Reduck finds a script for the site, runs it, and hands back the result. The
+[script catalogue](/explore/scripts) lists everything it can already do.
