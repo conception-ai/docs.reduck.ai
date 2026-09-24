@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Reduck MCP gives your agent reusable browser scripts for the sites that have no API, such as LinkedIn, Gmail or your own ERP. They run in your own Chrome, where you are already logged in.
+description: Reduck MCP gives your agent reusable browser scripts for the sites that have no API, such as LinkedIn or Gmail. They run in your own Chrome.
 section: get-started
 order: 10
 ---

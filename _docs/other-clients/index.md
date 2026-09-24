@@ -1,6 +1,6 @@
 ---
 title: Other clients
-description: Connect any MCP-capable agent to Reduck with the transport, URL and scope it needs.
+description: Connect any MCP-capable agent to Reduck with the transport, URL and scope it needs — or paste one line and let the agent write its own config.
 section: connect
 order: 900
 ---

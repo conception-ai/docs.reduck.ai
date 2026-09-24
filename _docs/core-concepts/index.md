@@ -1,6 +1,6 @@
 ---
 title: Core concepts
-description: Scripts, the official library, projects, and the two browsers a script can run on.
+description: Scripts, versions and handles, the official library, projects, and the two browsers a script can run on — the words the rest of these docs use.
 section: get-started
 order: 27
 ---

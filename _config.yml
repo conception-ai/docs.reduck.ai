@@ -1,11 +1,19 @@
 title: Reduck docs
 description: >-
-  Reduck MCP gives your agent reusable browser scripts for the sites with no API. They run in your
-  own Chrome, where you are already logged in. Connect an agent, run a script, or write one.
+  Connect an agent to Reduck, run a browser script on a site that has no API, and write one for a
+  site the official library does not cover yet.
+
+# What the home page puts after its own name, in the title bar and on a search result. Every other
+# page has a title of its own to say there; only the front of the docs has to borrow one.
+tagline: Automate any site, straight from your agent
 url: https://docs.reduck.ai
 app_url: https://reduck.ai
 discord_url: https://discord.gg/reduck
 lang: en
+locale: en_US
+
+# The account a card is attributed to on X.
+x_handle: "@ReduckAI"
 
 # Where a `::video` line's player is served from — Conception AI's Cloudflare Stream account.
 cloudflare_stream_domain: customer-469wlygs2m99dfwt.cloudflarestream.com
