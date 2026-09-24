@@ -58,11 +58,3 @@ and sign in to your Reduck account in the browser tab that opens.
 > The connection also drops whenever your internet or your session is interrupted, and it does not
 > come back on its own — sign in again from **MCP Servers → Authenticate**. Both problems are
 > being worked on.
-
-## If Reduck does not show up
-
-- **The file was not saved, or the JSON has a typo.** Reopen **View raw config** and check it.
-- **The address has something extra after it.** It is `https://mcp.reduck.ai/` and nothing more.
-- **The sign-in was never finished.** Click **Authenticate** next to `reduck` and complete it in
-  the browser before using a tool.
-- **The connection dropped after your internet cut out.** Sign in again from **MCP Servers**.
