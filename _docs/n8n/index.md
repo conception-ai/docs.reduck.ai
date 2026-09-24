@@ -66,18 +66,3 @@ Add `list_devices` if the workflow chooses a browser itself, and `list_runs` or
 Open the MCP Client Tool node. Once the key is accepted, the node lists the tools it found. Then
 run the workflow once and ask the agent to run `whoami` — it tells you which Reduck account the
 key belongs to.
-
-## If Reduck does not show up
-
-- **The transport is set to Server Sent Events.** Reduck does not support it. Switch to HTTP
-  Streamable.
-- **The header name is wrong.** It has to be `X-API-Key`, spelled exactly that way. Bearer Auth
-  works too, using a token instead of an API key.
-- **The node ran out of time.** See above — one minute is not enough for a browser run.
-- **The key is not valid.** n8n shows this as a failed connection rather than saying the key was
-  refused, so check the key before anything else.
-
-## The other direction
-
-This page covers n8n using Reduck. A Reduck script can also call n8n: a workflow's
-`/webhook/<path>` is an ordinary web address, so a script can reach it with no sign-in at all.

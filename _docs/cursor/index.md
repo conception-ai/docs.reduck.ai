@@ -78,11 +78,3 @@ Some setups have no browser to sign in with, such as Cloud Agents or a CI server
 `${env:REDUCK_API_KEY}` reads the key from your environment, so the key itself never sits in the
 file. Set it in your shell profile: Cursor's `envFile` setting does not apply to servers like this
 one.
-
-## If Reduck does not show up
-
-- **Cursor was not restarted** after you changed the file.
-- **The entry uses `command` instead of `url`.** `command` is for servers that run as a program on
-  your own machine. Reduck is a web address, so it needs `url`.
-- **The approval ran out.** If Cursor goes unused for a long time, the sign-in stops working and
-  Reduck quietly goes back to needing approval. Approve it again.
