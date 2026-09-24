@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Create an account, pair your browser, connect your agent to Reduck MCP, and run your first automation.
+description: Reduck MCP gives your agent reusable browser scripts for the sites that have no API, such as LinkedIn, Gmail or your own ERP. They run in your own Chrome, where you are already logged in.
 section: get-started
 order: 10
 ---
@@ -63,7 +63,7 @@ By exposing deterministic scripts as tools with a clear contract of inputs and o
 
 Reduck MCP possesses a unique blend of features that make it a first class tool for your Agent to automate complex web tasks:
 
-- **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain
+- **[Official script library](/docs/core-concepts#official-scripts-library)**: get started in minutes with the official library of scripts we maintain — your agent finds them by calling `list_scripts` with the handle `"reduck"`
 - **[Stealthy and private extension](/docs/core-concepts#browser)**: Reduck leverages your browser logged in state, fingerprints and residential IP so detection risk is minimal and credentials never leave your machine
 - **[Parallel runs](/docs/core-concepts#parallel-runs)**: scripts can be run in parallel with a single tool call for fast iterations
 
@@ -76,7 +76,7 @@ If our Official Script Library does not contain the exact scripts you want (e.g.
 - Provide a prompt to tell your Agent to build a new script, such as:
 
 ```markdown
-"Use Reduck MCP to create scripts for trends.google.com keywords"
+"Use Reduck MCP to create a script that pulls IMDb's US box office top 10 for the weekend, with each film's IMDb rating, vote count, genre and Metascore"
 ```
 
 - Once done your scripts can be discovered by your agent with Reduck MCP and can be found at [https://reduck.ai/projects/](https://reduck.ai/projects/)
