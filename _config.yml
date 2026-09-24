@@ -1,7 +1,7 @@
 title: Reduck docs
 description: >-
-  How to connect an agent to Reduck, run a script on a real browser, and write one for a site the
-  official library does not cover yet.
+  Reduck MCP gives your agent reusable browser scripts for the sites with no API. They run in your
+  own Chrome, where you are already logged in. Connect an agent, run a script, or write one.
 url: https://docs.reduck.ai
 app_url: https://reduck.ai
 discord_url: https://discord.gg/reduck

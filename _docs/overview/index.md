@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Create an account, pair your browser, connect your agent to Reduck MCP, and run your first automation.
+description: Reduck MCP gives your agent reusable browser scripts for the sites that have no API, such as LinkedIn, Gmail or your own ERP. They run in your own Chrome, where you are already logged in.
 section: get-started
 order: 10
 ---
