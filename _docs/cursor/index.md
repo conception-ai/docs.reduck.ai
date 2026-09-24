@@ -1,12 +1,12 @@
 ---
 title: Cursor
-description: Add the Reduck MCP server to Cursor with a two-line config file, and authorize it from Settings.
+description: Add the Reduck MCP server to Cursor with a two-line config file, and authorize it from Customize.
 section: connect
 order: 90
 ---
 
 Cursor reads MCP servers from a JSON file. There is no command to run: you write the file, then
-authorize from Settings.
+authorize from Customize.
 
 ## Before you start
 
@@ -35,16 +35,26 @@ time they talk.
 
 ## Authorize
 
-Open Cursor's settings and find Reduck under **MCP**. It is listed as
-**Needs authentication**; click it, approve the request in the browser, and the tools register.
+Open **Customize** in Cursor's sidebar and filter to **MCPs**. Reduck is listed under
+**Needs Attention**, as *Needs authentication*. Click **Authenticate**, approve the request in the
+browser, and the tools register.
+
+![Reduck listed under Needs Attention, waiting to be authenticated](needs-authentication.png)
 
 Until you do, the server has an empty tool list — which looks like a broken config and is not
 one.
 
+> [!NOTE]
+> Older versions of Cursor kept this under **Settings → MCP**. Plugins, MCPs, Skills and Rules
+> have since moved to **Customize**; Cursor shows a notice in Settings pointing there.
+
 ## Confirm it is connected
 
-Reduck's entry lists its tools once authorization completes. Then ask Cursor, in a chat, to call
-`whoami`. It reports the Reduck account and handle it is signed in as, which is the
+Reduck moves to **Connected** and its entry reports the tool count once authorization completes.
+
+![Reduck connected, with 30 tools enabled](connected.png)
+
+Then ask Cursor, in a chat, to call `whoami`. It reports the Reduck account and handle it is signed in as, which is the
 part worth checking: the OAuth flow signs you in as whichever Reduck account your browser is
 already using, not necessarily the one you meant.
 
