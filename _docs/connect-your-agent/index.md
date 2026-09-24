@@ -32,6 +32,8 @@ One command
 Config file
 ::tile [n8n](/docs/n8n)
 MCP Client Tool node
+::tile [Google Antigravity](/docs/antigravity)
+Raw JSON config
 ::tile [Any other agent](/docs/other-clients)
 Streamable HTTP
 :::
